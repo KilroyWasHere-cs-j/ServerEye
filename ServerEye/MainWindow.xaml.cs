@@ -62,7 +62,6 @@ namespace ServerEye
             }
         }
 
-
         //TODO extract hashed password
         private string GetConnectionString()
         {
