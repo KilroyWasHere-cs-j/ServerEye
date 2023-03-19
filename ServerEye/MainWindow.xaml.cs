@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -20,7 +17,7 @@ namespace ServerEye
             logManager = new LogManager("logs/main_log.txt");
             azureConnectionManager = new AzureConnectionManager();
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Interval = TimeSpan.FromMilliseconds(10);
             timer.Tick += Timer_Tick;
             timer.Start();
         }
@@ -33,6 +30,8 @@ namespace ServerEye
             // Needs to check if it's safe to close
             if (azureConnectionManager.isConnected)
             {
+                // Can't deside if we should keep this popup or not
+                MessageBox.Show("Closing connection");
                 e.Cancel = true;
                 logManager.Log("App trying to close with open connection");
                 azureConnectionManager.closeConnection();
@@ -44,6 +43,7 @@ namespace ServerEye
             }
         }
 
+        #region Event Handlers
         //<summary>
         // Watchdog to update UI
         //<summary>
@@ -53,29 +53,19 @@ namespace ServerEye
             {
                 case true:
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Green);
-                    ConnectionStatusText.Text = ConnectionStatus.Connected.ToString();
                     break;
                 case false:
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Red);
-                    ConnectionStatusText.Text = ConnectionStatus.Disconnected.ToString();
                     break;
             }
         }
 
-        //TODO extract hashed password
-        private string GetConnectionString()
+        
+        private void execute_Click(object sender, RoutedEventArgs e)
         {
-            string content = File.ReadAllText("cnnString.txt");
-            MessageBox.Show(content);
-            using (var sha256 = SHA256.Create())
-            {
-                // Send a sample text to hash.  
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes("hello world"));
-                // Get the hashed string.  
-                var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-                // Print the string.   
-                return hash;
-            }
+            azureConnectionManager.Connect();
+            azureConnectionManager.GetMatchData();
         }
+        #endregion
     }
 }
