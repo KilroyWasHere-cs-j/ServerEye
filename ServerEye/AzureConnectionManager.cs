@@ -81,26 +81,48 @@ namespace ServerEye
 
         public OdbcDataAdapter GetMatchData()
         {
-            // sp_Get_All_Match_Data
-            OdbcCommand cmd = new OdbcCommand("{call sp_Get_All_Match_Data (?)}", cnn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
-            return new OdbcDataAdapter(cmd);
+            try
+            {
+                // sp_Get_All_Match_Data
+                OdbcCommand cmd = new OdbcCommand("{call sp_Get_All_Match_Data (?)}", cnn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
+                return new OdbcDataAdapter(cmd);
+            }
+            catch(Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
         }
 
         public OdbcDataAdapter GetPickList()
         {
-            OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_RetrieveAverageScores_Summed (?)}", cnn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
-            return new OdbcDataAdapter(cmd);
+            try
+            {
+                OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_RetrieveAverageScores_Summed (?)}", cnn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
+                return new OdbcDataAdapter(cmd);
+            }catch(Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
         }
 
         public OdbcDataAdapter GenerateAmoryFirstPick()
         {
-            OdbcCommand cmd = new OdbcCommand("{call sp_amory_first_pick}", cnn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            return new OdbcDataAdapter(cmd);
+            try
+            {
+                OdbcCommand cmd = new OdbcCommand("{call sp_amory_first_pick}", cnn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                return new OdbcDataAdapter(cmd);
+            }catch(Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
         }
         #endregion
     }
