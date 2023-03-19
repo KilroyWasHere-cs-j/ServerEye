@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Data;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -54,6 +57,76 @@ namespace ServerEye
             if(azureConnectionManager.isConnected)
             {
                 azureConnectionManager.closeConnection();
+            }
+        }
+
+        private String DataTableToHTML(DataTable dt) 
+        {
+            StringBuilder strHTMLBuilder = new StringBuilder();
+            strHTMLBuilder.Append("<html >");
+            strHTMLBuilder.Append("<head>");
+            strHTMLBuilder.Append("</head>");
+            strHTMLBuilder.Append("<body>");
+            strHTMLBuilder.Append("<table border='1px' cellpadding='1' cellspacing='1' bgcolor='lightyellow' style='font-family:Garamond; font-size:smaller'>");
+            strHTMLBuilder.Append("<tr >");
+            foreach (DataColumn myColumn in dt.Columns)
+            {
+                strHTMLBuilder.Append("<td >");
+                strHTMLBuilder.Append(myColumn.ColumnName);
+                strHTMLBuilder.Append("</td>");
+            }
+            strHTMLBuilder.Append("</tr>");
+            foreach (DataRow myRow in dt.Rows)
+            {
+                strHTMLBuilder.Append("<tr >");
+                foreach (DataColumn myColumn in dt.Columns)
+                {
+                    strHTMLBuilder.Append("<td >");
+                    strHTMLBuilder.Append(myRow[myColumn.ColumnName].ToString());
+                    strHTMLBuilder.Append("</td>");
+                }
+                strHTMLBuilder.Append("</tr>");
+            }
+            //Close tags.
+            strHTMLBuilder.Append("</table>");
+            strHTMLBuilder.Append("</body>");
+            strHTMLBuilder.Append("</html>");
+            string Htmltext = strHTMLBuilder.ToString();
+            //MessageBox.Show(Htmltext);
+            //File.WriteAllText(Directory.GetCurrentDirectory() + "/data.html", Htmltext);
+            return Htmltext;
+        }
+
+        private void SendReports(DataTable pickList, DataTable amoryPick1)
+        {
+            String SendMailFrom = "scouteyereports@gmail.com";
+            String SendMailSubject = "Scouting reports at->" + DateTime.Now.ToString("h:mm:ss tt");
+            String SendMailBody = "<h1>PickList<h1>" + DataTableToHTML(pickList) + "<br>" + "<h1>Amory One seat pick<h1>" + DataTableToHTML(amoryPick1);
+            try
+            {
+                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com", 587);
+                SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                MailMessage email = new MailMessage();
+                // START
+                email.From = new MailAddress(SendMailFrom);
+                email.To.Add("jwtower@gmail.com");
+                email.To.Add("gabriel.tower@baxter-academy.org");
+                email.CC.Add(SendMailFrom);
+                email.Subject = SendMailSubject;
+                email.Body = SendMailBody;
+                email.IsBodyHtml = true;
+                //END
+                SmtpServer.Timeout = 5000;
+                SmtpServer.EnableSsl = true;
+                SmtpServer.UseDefaultCredentials = false;
+                SmtpServer.Credentials = new NetworkCredential(SendMailFrom, "dsoiisecxpnsiupz");
+                SmtpServer.Send(email);
+
+                logManager.Log("Email Successfully Sent");
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message); // A magical exception happens, but the email is still sent
             }
         }
 
@@ -127,6 +200,7 @@ namespace ServerEye
                 var adpter = azureConnectionManager.GetPickList();
                 DataSet ds = new DataSet();
                 adpter.Fill(ds);
+                DataTableToHTML(ds.Tables[0]);
                 tableDisplay = new TableDisplay(ds.Tables[0]);
                 tableDisplay.Show();
             }
@@ -155,6 +229,35 @@ namespace ServerEye
         private void generateAmorySecondPick_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Yeah so... \n this query hasn't been added yet...");
+        }
+
+        private void sendReports_Click(object sender, RoutedEventArgs e)
+        {
+            DataSet pickListDS = new DataSet();
+            DataSet amoryFirstPickDS = new DataSet();
+            if (azureConnectionManager.isConnected)
+            {
+                var adpter = azureConnectionManager.GetPickList();
+                adpter.Fill(pickListDS);
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                var adpter = azureConnectionManager.GetPickList();
+                adpter.Fill(pickListDS);
+            }
+            if (azureConnectionManager.isConnected)
+            {
+                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                adpter.Fill(amoryFirstPickDS);
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                adpter.Fill(amoryFirstPickDS);
+            }
+            SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0]);
         }
         #endregion
     }
