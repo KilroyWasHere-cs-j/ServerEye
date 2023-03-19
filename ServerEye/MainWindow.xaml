@@ -5,16 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerEye"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" MaxHeight="450" MaxWidth="800"
-        ResizeMode="CanMinimize" Closing="Window_Closing">
+        Title="ServerEye" Height="450" Width="800" MaxHeight="450" MaxWidth="800"
+        ResizeMode="CanMinimize" 
+        Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="85*"/>
-            <RowDefinition Height="284*"/>
-            <RowDefinition Height="65*"/>
+            <RowDefinition Height="349*"/>
         </Grid.RowDefinitions>
-        <Rectangle x:Name="ConnectionStatusLight" HorizontalAlignment="Center" Height="68" Margin="0,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="268"/>
-        <ProgressBar Margin="98,10,135,22" Grid.Row="2"/>
-        <Button Content="Execute" HorizontalAlignment="Left" Margin="353,0,0,0" Grid.Row="1" VerticalAlignment="Center" Height="122" Width="138" Click="execute_Click"/>
+        <Rectangle HorizontalAlignment="Center" Height="329" Grid.Row="1" Stroke="Black" VerticalAlignment="Center" Width="780"/>
+        <Rectangle x:Name="ConnectionStatusLight" HorizontalAlignment="Center" Margin="0,14,0,10" Stroke="Black" Width="268"/>
+        <Button Content="Pull Down All" HorizontalAlignment="Left" Margin="24,22,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="pullDownAll_Click" Grid.Row="1"/>
+        <Button Content="Generate Pick List" HorizontalAlignment="Left" Margin="204,22,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="generatePickList_Click" Grid.Row="1"/>
     </Grid>
 </Window>

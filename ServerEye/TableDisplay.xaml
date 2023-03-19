@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerEye"
         mc:Ignorable="d"
-        Title="TableDisplay" Height="1000" Width="1800">
+        Title="DataDisplay" Height="1000" Width="1800"
+        ResizeMode="CanMinimize"
+        WindowState="Maximized">
     <Grid>
         <DataGrid x:Name="display" ItemsSource="{Binding}"/>
     </Grid>

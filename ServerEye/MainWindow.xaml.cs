@@ -61,10 +61,34 @@ namespace ServerEye
         }
 
         
-        private void execute_Click(object sender, RoutedEventArgs e)
+        private void pullDownAll_Click(object sender, RoutedEventArgs e)
         {
-            azureConnectionManager.Connect();
-            azureConnectionManager.GetMatchData();
+            if (azureConnectionManager.isConnected)
+            {
+                azureConnectionManager.GetMatchData();
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                azureConnectionManager.GetMatchData();
+            }
+        }
+
+        private void kill_Click(object sender, RoutedEventArgs e)
+        {
+            azureConnectionManager.closeConnection();
+        }
+        private void generatePickList_Click(object sender, RoutedEventArgs e)
+        {
+            if (azureConnectionManager.isConnected)
+            {
+                azureConnectionManager.GetPickList();
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                azureConnectionManager.GetPickList();
+            }
         }
         #endregion
     }

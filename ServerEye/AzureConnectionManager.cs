@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Data.Odbc;
+using System.Net;
+using System.Text;
 using System.Windows;
 
 namespace ServerEye
@@ -15,6 +17,8 @@ namespace ServerEye
         private TableDisplay td;
 
         private OdbcConnection cnn;
+
+        private DataTable table;
         public AzureConnectionManager()
         {
             logManager = new LogManager("logs/connection_log.txt");
@@ -32,9 +36,11 @@ namespace ServerEye
                 cnn.Open();
                 isConnected = true;
                 logManager.Log("Connected to Azure");
+                SendToHook("Connected to Azure");
             }
             catch (Exception e)
             {
+                SendToHook($"Failed Azure connect {e.Message}");
                 MessageBox.Show(e.Message);
                 logManager.Log(e.Message);
             }
@@ -51,30 +57,48 @@ namespace ServerEye
                 cnn.Close();
                 isConnected = false;
                 logManager.Log("Disconnected form Azure");
+                SendToHook("Disconnected form Azure");
             }
             catch (Exception e)
             {
+                SendToHook($"Failed Azure disconnect {e.Message}");
                 MessageBox.Show(e.Message);
                 logManager.Log(e.Message);
             }
         }
 
+        public void SendToHook(string message)
+        {
+            string webhook = "https://discord.com/api/webhooks/1082337403567620126/vlmEzBxb8jvIapfZLz4PDreZWWOFwP59-LE9rOkaRZ4YQNofF6nw-CLrJS0r6cbIBIwl";
+
+            WebClient client = new WebClient();
+            client.Headers.Add("Content-Type", "application/json");
+            string payload = "{\"content\": \"" + "Stevie Wonder " + message + " at-> " + DateTime.Now.ToString("h:mm:ss tt") + "\"}";
+            client.UploadData(webhook, Encoding.UTF8.GetBytes(payload));
+        }
+
+        #region Queries
         public void GetMatchData()
         {
-            DataTable table = new DataTable();
             string query = "SELECT CD.Description + CAST(CD.[Year] AS VARCHAR(50)) AS Competition,\r\n\tS.ScoutName AS Scout, [Match], Alliance, TeamNumber, AutoZero, AutoOne, AutoTwo, AutoThree, AutoFour, AutoFive, TeleopZero, TeleopOne, TeleopTwo, TeleopThree, TeleopFour, TeleopFive\r\nFROM MatchData MD\r\nJOIN CompDesc CD ON MD.CompetitionID = CD.CompID\r\nJOIN Scouts S ON MD.ScoutId = S.ScoutID";
             OdbcCommand cmd = new OdbcCommand(query, cnn);
-            using (OdbcDataReader returnRead = cmd.ExecuteReader())
-            {
-                logManager.Log("Executing SQL Query");
-                while (returnRead.Read())
-                {
-                    table = returnRead.GetSchemaTable();
-                    td = new TableDisplay(table);
-                }
-                logManager.Log("Query complete");
-                td.Show();
-            }
+            OdbcDataAdapter adpter = new OdbcDataAdapter(query, cnn);
+            DataSet ds = new DataSet();
+            adpter.Fill(ds);
+            td = new TableDisplay(ds.Tables[0]);
+            td.Show();
         }
+
+        public void GetPickList()
+        {
+            string query = "SELECT CD.Description + CAST(CD.[Year] AS VARCHAR(50)) AS Competition,\r\n\tTeamNumber, AVG(CAST(AutoZero AS INT)) + AVG(CAST(AutoOne AS INT)) + AVG(CAST(TeleopZero AS INT)) + AVG(CAST(TeleopOne AS INT))\r\nFROM MatchData MD\r\nJOIN CompDesc CD ON MD.CompetitionID = CD.CompID\r\nGROUP BY CD.Description, CD.Year, MD.TeamNumber\r\nORDER BY AVG(CAST(AutoZero AS INT)) + AVG(CAST(AutoOne AS INT)) + AVG(CAST(TeleopZero AS INT)) + AVG(CAST(TeleopOne AS INT)) DESC";
+            OdbcCommand cmd = new OdbcCommand(query, cnn);
+            OdbcDataAdapter adpter = new OdbcDataAdapter(query, cnn);
+            DataSet ds = new DataSet();
+            adpter.Fill(ds);
+            td = new TableDisplay(ds.Tables[0]);
+            td.Show();
+        }
+        #endregion
     }
 }

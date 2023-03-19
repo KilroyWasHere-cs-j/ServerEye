@@ -11,7 +11,7 @@ namespace ServerEye
         public TableDisplay(DataTable table)
         {
             InitializeComponent();
-            display.DataContext = table.DefaultView;
+            display.DataContext = table;
         }
     }
 }
