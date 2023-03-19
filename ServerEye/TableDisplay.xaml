@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="DataDisplay" Height="1000" Width="1800"
         ResizeMode="CanMinimize"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        KeyDown="bind_KeyPress">
     <Grid>
         <DataGrid x:Name="display" ItemsSource="{Binding}"/>
     </Grid>

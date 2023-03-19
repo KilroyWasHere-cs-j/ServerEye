@@ -18,7 +18,6 @@ namespace ServerEye
 
         private OdbcConnection cnn;
 
-        private DataTable table;
         public AzureConnectionManager()
         {
             logManager = new LogManager("logs/connection_log.txt");
@@ -69,6 +68,7 @@ namespace ServerEye
 
         public void SendToHook(string message)
         {
+            //WindowsIdentity.GetCurrent().Name
             string webhook = "https://discord.com/api/webhooks/1082337403567620126/vlmEzBxb8jvIapfZLz4PDreZWWOFwP59-LE9rOkaRZ4YQNofF6nw-CLrJS0r6cbIBIwl";
 
             WebClient client = new WebClient();
@@ -78,26 +78,29 @@ namespace ServerEye
         }
 
         #region Queries
-        public void GetMatchData()
+
+        public OdbcDataAdapter GetMatchData()
         {
-            string query = "SELECT CD.Description + CAST(CD.[Year] AS VARCHAR(50)) AS Competition,\r\n\tS.ScoutName AS Scout, [Match], Alliance, TeamNumber, AutoZero, AutoOne, AutoTwo, AutoThree, AutoFour, AutoFive, TeleopZero, TeleopOne, TeleopTwo, TeleopThree, TeleopFour, TeleopFive\r\nFROM MatchData MD\r\nJOIN CompDesc CD ON MD.CompetitionID = CD.CompID\r\nJOIN Scouts S ON MD.ScoutId = S.ScoutID";
-            OdbcCommand cmd = new OdbcCommand(query, cnn);
-            OdbcDataAdapter adpter = new OdbcDataAdapter(query, cnn);
-            DataSet ds = new DataSet();
-            adpter.Fill(ds);
-            td = new TableDisplay(ds.Tables[0]);
-            td.Show();
+            // sp_Get_All_Match_Data
+            OdbcCommand cmd = new OdbcCommand("{call sp_Get_All_Match_Data (?)}", cnn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
+            return new OdbcDataAdapter(cmd);
         }
 
-        public void GetPickList()
+        public OdbcDataAdapter GetPickList()
         {
-            string query = "SELECT CD.Description + CAST(CD.[Year] AS VARCHAR(50)) AS Competition,\r\n\tTeamNumber, AVG(CAST(AutoZero AS INT)) + AVG(CAST(AutoOne AS INT)) + AVG(CAST(TeleopZero AS INT)) + AVG(CAST(TeleopOne AS INT))\r\nFROM MatchData MD\r\nJOIN CompDesc CD ON MD.CompetitionID = CD.CompID\r\nGROUP BY CD.Description, CD.Year, MD.TeamNumber\r\nORDER BY AVG(CAST(AutoZero AS INT)) + AVG(CAST(AutoOne AS INT)) + AVG(CAST(TeleopZero AS INT)) + AVG(CAST(TeleopOne AS INT)) DESC";
-            OdbcCommand cmd = new OdbcCommand(query, cnn);
-            OdbcDataAdapter adpter = new OdbcDataAdapter(query, cnn);
-            DataSet ds = new DataSet();
-            adpter.Fill(ds);
-            td = new TableDisplay(ds.Tables[0]);
-            td.Show();
+            OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_RetrieveAverageScores_Summed (?)}", cnn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
+            return new OdbcDataAdapter(cmd);
+        }
+
+        public OdbcDataAdapter GenerateAmoryFirstPick()
+        {
+            OdbcCommand cmd = new OdbcCommand("{call sp_amory_first_pick}", cnn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            return new OdbcDataAdapter(cmd);
         }
         #endregion
     }

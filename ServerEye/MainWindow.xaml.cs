@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -11,6 +13,9 @@ namespace ServerEye
         private AzureConnectionManager azureConnectionManager;
         private LogManager logManager;
         private DispatcherTimer timer;
+
+        private TableDisplay tableDisplay;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -43,6 +48,15 @@ namespace ServerEye
             }
         }
 
+        // Disconnected the connection if it's open
+        private void MakeSafe()
+        {
+            if(azureConnectionManager.isConnected)
+            {
+                azureConnectionManager.closeConnection();
+            }
+        }
+
         #region Event Handlers
         //<summary>
         // Watchdog to update UI
@@ -53,42 +67,94 @@ namespace ServerEye
             {
                 case true:
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Green);
+                    SafeBTN.IsEnabled = true;
                     break;
                 case false:
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Red);
+                    SafeBTN.IsEnabled = false;
                     break;
             }
         }
 
-        
+        private void bind_KeyPress(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.S:
+                    MakeSafe();
+                    break;
+            }
+        }   
+        private void safe_Click(object sender, RoutedEventArgs e)
+        {
+            MakeSafe();
+        }
+
         private void pullDownAll_Click(object sender, RoutedEventArgs e)
         {
             if (azureConnectionManager.isConnected)
             {
-                azureConnectionManager.GetMatchData();
+                var adpter = azureConnectionManager.GetMatchData();
+                DataSet ds = new DataSet();
+                adpter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
             }
             else
             {
                 azureConnectionManager.Connect();
-                azureConnectionManager.GetMatchData();
+                var adpter = azureConnectionManager.GetMatchData();
+                DataSet ds = new DataSet();
+                adpter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
             }
         }
 
-        private void kill_Click(object sender, RoutedEventArgs e)
-        {
-            azureConnectionManager.closeConnection();
-        }
         private void generatePickList_Click(object sender, RoutedEventArgs e)
         {
             if (azureConnectionManager.isConnected)
             {
-                azureConnectionManager.GetPickList();
+                var adpter = azureConnectionManager.GetPickList();
+                DataSet ds = new DataSet();
+                adpter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
             }
             else
             {
                 azureConnectionManager.Connect();
-                azureConnectionManager.GetPickList();
+                var adpter = azureConnectionManager.GetPickList();
+                DataSet ds = new DataSet();
+                adpter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
             }
+        }
+        private void generateAmoryFirstPick_Click(object sender, RoutedEventArgs e)
+        {
+            if (azureConnectionManager.isConnected)
+            {
+                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                DataSet ds = new DataSet();
+                adpter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                DataSet ds = new DataSet();
+                adpter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
+            }
+        }
+
+        private void generateAmorySecondPick_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Yeah so... \n this query hasn't been added yet...");
         }
         #endregion
     }
