@@ -41,13 +41,13 @@ namespace ServerEye
                 // Can't deside if we should keep this popup or not
                 MessageBox.Show("Closing connection");
                 e.Cancel = true;
-                logManager.Log("App trying to close with open connection");
+                logManager.Log("App attemped to close with open connection. Closing prevented and connection automatically closed");
                 azureConnectionManager.closeConnection();
             }
             else
             {
                 e.Cancel = false;
-                logManager.Log("Closing");
+                logManager.Log("Connection closeing");
             }
         }
 
@@ -57,53 +57,63 @@ namespace ServerEye
             if(azureConnectionManager.isConnected)
             {
                 azureConnectionManager.closeConnection();
+                logManager.Log("System safe");
             }
         }
 
         private String DataTableToHTML(DataTable dt) 
         {
-            StringBuilder strHTMLBuilder = new StringBuilder();
-            strHTMLBuilder.Append("<html >");
-            strHTMLBuilder.Append("<head>");
-            strHTMLBuilder.Append("</head>");
-            strHTMLBuilder.Append("<body>");
-            strHTMLBuilder.Append("<table border='1px' cellpadding='1' cellspacing='1' bgcolor='lightyellow' style='font-family:Garamond; font-size:smaller'>");
-            strHTMLBuilder.Append("<tr >");
-            foreach (DataColumn myColumn in dt.Columns)
+            try
             {
-                strHTMLBuilder.Append("<td >");
-                strHTMLBuilder.Append(myColumn.ColumnName);
-                strHTMLBuilder.Append("</td>");
-            }
-            strHTMLBuilder.Append("</tr>");
-            foreach (DataRow myRow in dt.Rows)
-            {
+                StringBuilder strHTMLBuilder = new StringBuilder();
+                strHTMLBuilder.Append("<html >");
+                strHTMLBuilder.Append("<head>");
+                strHTMLBuilder.Append("</head>");
+                strHTMLBuilder.Append("<body>");
+                strHTMLBuilder.Append("<table border='1px' cellpadding='1' cellspacing='1' bgcolor='lightyellow' style='font-family:Garamond; font-size:smaller'>");
                 strHTMLBuilder.Append("<tr >");
                 foreach (DataColumn myColumn in dt.Columns)
                 {
                     strHTMLBuilder.Append("<td >");
-                    strHTMLBuilder.Append(myRow[myColumn.ColumnName].ToString());
+                    strHTMLBuilder.Append(myColumn.ColumnName);
                     strHTMLBuilder.Append("</td>");
                 }
                 strHTMLBuilder.Append("</tr>");
+                foreach (DataRow myRow in dt.Rows)
+                {
+                    strHTMLBuilder.Append("<tr >");
+                    foreach (DataColumn myColumn in dt.Columns)
+                    {
+                        strHTMLBuilder.Append("<td >");
+                        strHTMLBuilder.Append(myRow[myColumn.ColumnName].ToString());
+                        strHTMLBuilder.Append("</td>");
+                    }
+                    strHTMLBuilder.Append("</tr>");
+                }
+                //Close tags.
+                strHTMLBuilder.Append("</table>");
+                strHTMLBuilder.Append("</body>");
+                strHTMLBuilder.Append("</html>");
+                string Htmltext = strHTMLBuilder.ToString();
+                //MessageBox.Show(Htmltext);
+                //File.WriteAllText(Directory.GetCurrentDirectory() + "/data.html", Htmltext);
+                return Htmltext;
             }
-            //Close tags.
-            strHTMLBuilder.Append("</table>");
-            strHTMLBuilder.Append("</body>");
-            strHTMLBuilder.Append("</html>");
-            string Htmltext = strHTMLBuilder.ToString();
-            //MessageBox.Show(Htmltext);
-            //File.WriteAllText(Directory.GetCurrentDirectory() + "/data.html", Htmltext);
-            return Htmltext;
+            catch (Exception ex)
+            {
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Failed to perpare reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
         }
 
         private void SendReports(DataTable pickList, DataTable amoryPick1)
         {
             String SendMailFrom = "scouteyereports@gmail.com";
             String SendMailSubject = "Scouting reports at->" + DateTime.Now.ToString("h:mm:ss tt");
-            String SendMailBody = "<h1>PickList<h1>" + DataTableToHTML(pickList) + "<br>" + "<h1>Amory One seat pick<h1>" + DataTableToHTML(amoryPick1);
             try
             {
+                String SendMailBody = "<h1>PickList<h1>" + DataTableToHTML(pickList) + "<br>" + "<h1>Amory One seat pick<h1>" + DataTableToHTML(amoryPick1);
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com", 587);
                 SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
                 MailMessage email = new MailMessage();
@@ -124,9 +134,10 @@ namespace ServerEye
 
                 logManager.Log("Email Successfully Sent");
             }
-            catch(Exception e)
+            catch(Exception ex)
             {
-                MessageBox.Show(e.Message); // A magical exception happens, but the email is still sent
+                logManager.Log(ex.Message); // A magical exception happens, but the email is still sent
+                MessageBox.Show($"Failed to send report \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -158,6 +169,7 @@ namespace ServerEye
                     break;
             }
         }   
+
         private void safe_Click(object sender, RoutedEventArgs e)
         {
             MakeSafe();
@@ -165,64 +177,88 @@ namespace ServerEye
 
         private void pullDownAll_Click(object sender, RoutedEventArgs e)
         {
-            if (azureConnectionManager.isConnected)
+            try
             {
-                var adpter = azureConnectionManager.GetMatchData();
-                DataSet ds = new DataSet();
-                adpter.Fill(ds);
-                tableDisplay = new TableDisplay(ds.Tables[0]);
-                tableDisplay.Show();
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GetMatchData();
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GetMatchData();
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                azureConnectionManager.Connect();
-                var adpter = azureConnectionManager.GetMatchData();
-                DataSet ds = new DataSet();
-                adpter.Fill(ds);
-                tableDisplay = new TableDisplay(ds.Tables[0]);
-                tableDisplay.Show();
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void generatePickList_Click(object sender, RoutedEventArgs e)
         {
-            if (azureConnectionManager.isConnected)
+            try
             {
-                var adpter = azureConnectionManager.GetPickList();
-                DataSet ds = new DataSet();
-                adpter.Fill(ds);
-                tableDisplay = new TableDisplay(ds.Tables[0]);
-                tableDisplay.Show();
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GetPickList();
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GetPickList();
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    DataTableToHTML(ds.Tables[0]);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                azureConnectionManager.Connect();
-                var adpter = azureConnectionManager.GetPickList();
-                DataSet ds = new DataSet();
-                adpter.Fill(ds);
-                DataTableToHTML(ds.Tables[0]);
-                tableDisplay = new TableDisplay(ds.Tables[0]);
-                tableDisplay.Show();
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void generateAmoryFirstPick_Click(object sender, RoutedEventArgs e)
         {
-            if (azureConnectionManager.isConnected)
+            try
             {
-                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
-                DataSet ds = new DataSet();
-                adpter.Fill(ds);
-                tableDisplay = new TableDisplay(ds.Tables[0]);
-                tableDisplay.Show();
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                azureConnectionManager.Connect();
-                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
-                DataSet ds = new DataSet();
-                adpter.Fill(ds);
-                tableDisplay = new TableDisplay(ds.Tables[0]);
-                tableDisplay.Show();
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -233,31 +269,39 @@ namespace ServerEye
 
         private void sendReports_Click(object sender, RoutedEventArgs e)
         {
-            DataSet pickListDS = new DataSet();
-            DataSet amoryFirstPickDS = new DataSet();
-            if (azureConnectionManager.isConnected)
+            try
             {
-                var adpter = azureConnectionManager.GetPickList();
-                adpter.Fill(pickListDS);
+                DataSet pickListDS = new DataSet();
+                DataSet amoryFirstPickDS = new DataSet();
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GetPickList();
+                    adpter.Fill(pickListDS);
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GetPickList();
+                    adpter.Fill(pickListDS);
+                }
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    adpter.Fill(amoryFirstPickDS);
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    adpter.Fill(amoryFirstPickDS);
+                }
+                SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0]);
             }
-            else
+            catch(Exception ex)
             {
-                azureConnectionManager.Connect();
-                var adpter = azureConnectionManager.GetPickList();
-                adpter.Fill(pickListDS);
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            if (azureConnectionManager.isConnected)
-            {
-                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
-                adpter.Fill(amoryFirstPickDS);
-            }
-            else
-            {
-                azureConnectionManager.Connect();
-                var adpter = azureConnectionManager.GenerateAmoryFirstPick();
-                adpter.Fill(amoryFirstPickDS);
-            }
-            SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0]);
         }
         #endregion
     }

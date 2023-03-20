@@ -74,7 +74,7 @@ namespace ServerEye
             WebClient client = new WebClient();
             client.Headers.Add("Content-Type", "application/json");
             string payload = "{\"content\": \"" + "Stevie Wonder " + message + " at-> " + DateTime.Now.ToString("h:mm:ss tt") + "\"}";
-            //client.UploadData(webhook, Encoding.UTF8.GetBytes(payload));
+            client.UploadData(webhook, Encoding.UTF8.GetBytes(payload));
         }
 
         #region Queries
@@ -104,7 +104,8 @@ namespace ServerEye
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
                 return new OdbcDataAdapter(cmd);
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 logManager.Log(e.Message);
                 return null;
@@ -118,7 +119,8 @@ namespace ServerEye
                 OdbcCommand cmd = new OdbcCommand("{call sp_amory_first_pick}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 return new OdbcDataAdapter(cmd);
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 logManager.Log(e.Message);
                 return null;
