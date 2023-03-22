@@ -79,14 +79,14 @@ namespace ServerEye
 
         #region Queries
 
-        public OdbcDataAdapter GetMatchData()
+        public OdbcDataAdapter GetMatchData(int cID)
         {
             try
             {
                 // sp_Get_All_Match_Data
                 OdbcCommand cmd = new OdbcCommand("{call sp_Get_All_Match_Data (?)}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
+                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
                 return new OdbcDataAdapter(cmd);
             }
             catch(Exception e)
@@ -96,13 +96,13 @@ namespace ServerEye
             }
         }
 
-        public OdbcDataAdapter GetPickList()
+        public OdbcDataAdapter GetPickList(int cID)
         {
             try
             {
                 OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_RetrieveAverageScores_Summed (?)}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CompetitionNumber", 1);
+                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
                 return new OdbcDataAdapter(cmd);
             }
             catch(Exception e)
@@ -112,15 +112,31 @@ namespace ServerEye
             }
         }
 
-        public OdbcDataAdapter GenerateAmoryFirstPick()
+        public OdbcDataAdapter GenerateAmoryFirstPick(int cID)
         {
             try
             {
                 OdbcCommand cmd = new OdbcCommand("{call sp_amory_first_pick}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
                 return new OdbcDataAdapter(cmd);
             }
             catch(Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
+        }
+        public OdbcDataAdapter GenerateAmorySecondPick(int cID)
+        {
+            try
+            {
+                OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_AmorySecondPick}", cnn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
+                return new OdbcDataAdapter(cmd);
+            }
+            catch (Exception e)
             {
                 logManager.Log(e.Message);
                 return null;

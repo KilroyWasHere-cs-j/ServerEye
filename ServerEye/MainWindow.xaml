@@ -22,5 +22,6 @@
         <Button Content="The Jon Amory FIRST Pick" HorizontalAlignment="Left" Margin="384,22,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="generateAmoryFirstPick_Click" Grid.Row="1"/>
         <Button Content="The Jon Amory Second Pick" HorizontalAlignment="Left" Margin="564,22,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="generateAmorySecondPick_Click" Grid.Row="1"/>
         <Button Content="Send Reports" HorizontalAlignment="Left" Margin="24,276,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="sendReports_Click" Grid.Row="1"/>
+        <TextBox x:Name="CompIDTB" HorizontalAlignment="Left" Margin="54,28,0,0" TextWrapping="Wrap" Text="CompID" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>

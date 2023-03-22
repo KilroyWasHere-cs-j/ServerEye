@@ -181,7 +181,7 @@ namespace ServerEye
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GetMatchData();
+                    var adpter = azureConnectionManager.GetMatchData(Int32.Parse(CompIDTB.Text));
                     DataSet ds = new DataSet();
                     adpter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
@@ -190,7 +190,7 @@ namespace ServerEye
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GetMatchData();
+                    var adpter = azureConnectionManager.GetMatchData(Int32.Parse(CompIDTB.Text));
                     DataSet ds = new DataSet();
                     adpter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
@@ -210,7 +210,7 @@ namespace ServerEye
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GetPickList();
+                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
                     DataSet ds = new DataSet();
                     adpter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
@@ -219,7 +219,7 @@ namespace ServerEye
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GetPickList();
+                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
                     DataSet ds = new DataSet();
                     adpter.Fill(ds);
                     DataTableToHTML(ds.Tables[0]);
@@ -239,7 +239,7 @@ namespace ServerEye
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
                     DataSet ds = new DataSet();
                     adpter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
@@ -248,7 +248,7 @@ namespace ServerEye
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
                     DataSet ds = new DataSet();
                     adpter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
@@ -275,24 +275,24 @@ namespace ServerEye
                 DataSet amoryFirstPickDS = new DataSet();
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GetPickList();
+                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
                     adpter.Fill(pickListDS);
                 }
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GetPickList();
+                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
                     adpter.Fill(pickListDS);
                 }
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
                     adpter.Fill(amoryFirstPickDS);
                 }
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick();
+                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
                     adpter.Fill(amoryFirstPickDS);
                 }
                 SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0]);
