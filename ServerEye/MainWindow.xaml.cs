@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Data;
-using System.IO.Compression;
 using System.Net;
 using System.Net.Mail;
-using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -366,6 +364,20 @@ namespace ServerEye
                 logManager.Log(ex.Message);
                 MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        private void structuredQuery_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void directQuery_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void insert_Click(object sender, RoutedEventArgs e)
+        {
+
         }
         #endregion
     }
