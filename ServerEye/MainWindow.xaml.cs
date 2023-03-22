@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Data;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -107,13 +110,13 @@ namespace ServerEye
             }
         }
 
-        private void SendReports(DataTable pickList, DataTable amoryPick1)
+        private void SendReports(DataTable pickList, DataTable amoryPick1, DataTable amoryPick2)
         {
             String SendMailFrom = "scouteyereports@gmail.com";
             String SendMailSubject = "Scouting reports at->" + DateTime.Now.ToString("h:mm:ss tt");
             try
             {
-                String SendMailBody = "<h1>PickList<h1>" + DataTableToHTML(pickList) + "<br>" + "<h1>Amory One seat pick<h1>" + DataTableToHTML(amoryPick1);
+                String SendMailBody = "<h1>PickList<h1>" + DataTableToHTML(pickList) + "<br>" + "<h1>Amory One seat pick<h1>" + DataTableToHTML(amoryPick1) + "<br>" + "<h1>Amory Two seat pick<h1>" + DataTableToHTML(amoryPick2) + "<br>" + "<h2> Kilroy Was Here<h2>";
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com", 587);
                 SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
                 MailMessage email = new MailMessage();
@@ -157,6 +160,31 @@ namespace ServerEye
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Red);
                     SafeBTN.IsEnabled = false;
                     break;
+            }
+
+            // If the value in the compID box isn't a number then don't enable the boxes
+            try
+            {
+                Int32.Parse(CompIDTB.Text);
+                foreach (UIElement element in Grid.Children)
+                {
+                    if (element is Button)
+                    {
+                        Button button = (Button)element;
+                        button.IsEnabled = true;
+                    }
+                }
+            }
+            catch
+            {
+                foreach (UIElement element in Grid.Children)
+                {
+                    if(element is Button)
+                    {
+                        Button button = (Button)element;
+                        button.IsEnabled = false;
+                    }
+                }
             }
         }
 
@@ -264,7 +292,31 @@ namespace ServerEye
 
         private void generateAmorySecondPick_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Yeah so... \n this query hasn't been added yet...");
+            try
+            {
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                    DataSet ds = new DataSet();
+                    adpter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void sendReports_Click(object sender, RoutedEventArgs e)
@@ -273,6 +325,7 @@ namespace ServerEye
             {
                 DataSet pickListDS = new DataSet();
                 DataSet amoryFirstPickDS = new DataSet();
+                DataSet amorySecondPickDS = new DataSet();
                 if (azureConnectionManager.isConnected)
                 {
                     var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
@@ -295,7 +348,18 @@ namespace ServerEye
                     var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
                     adpter.Fill(amoryFirstPickDS);
                 }
-                SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0]);
+                if (azureConnectionManager.isConnected)
+                {
+                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                    adpter.Fill(amorySecondPickDS);
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                    adpter.Fill(amorySecondPickDS);
+                }
+                SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0], amorySecondPickDS.Tables[0]);
             }
             catch(Exception ex)
             {
