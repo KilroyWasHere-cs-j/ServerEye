@@ -23,9 +23,10 @@
         <Button Content="The Jon Amory Second Pick" HorizontalAlignment="Left" Margin="564,22,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="generateAmorySecondPick_Click" Grid.Row="1"/>
         <Button Content="Send Reports" HorizontalAlignment="Left" Margin="24,276,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="sendReports_Click" Grid.Row="1"/>
         <Button Content="Structured Query" IsEnabled="False" HorizontalAlignment="Left" Margin="24,74,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="structuredQuery_Click" Grid.Row="1"/>
-        <Button Content="Direct Query" IsEnabled="False" HorizontalAlignment="Left" Margin="599,224,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="directQuery_Click" Grid.Row="1"/>
-        <Button Content="Insert" IsEnabled="False" HorizontalAlignment="Left" Margin="599,276,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="insert_Click" Grid.Row="1"/>
+        <Button x:Name="DirectQueryBTN" Content="Direct Query" IsEnabled="False" HorizontalAlignment="Left" Margin="599,224,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="directQuery_Click" Grid.Row="1"/>
+        <Button x:Name="InsertBTN" Content="Insert" IsEnabled="False" HorizontalAlignment="Left" Margin="599,276,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="insert_Click" Grid.Row="1"/>
         <Label Content="CompID" HorizontalAlignment="Left" Margin="54,14,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="CompIDTB" HorizontalAlignment="Left" Margin="54,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Height="20"/>
+        <Label x:Name="AccessLevelLB" Content="AccessLevel" HorizontalAlignment="Left" Margin="553,-4,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

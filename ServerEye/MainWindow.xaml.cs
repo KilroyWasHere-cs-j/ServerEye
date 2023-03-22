@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-
+using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -14,12 +14,14 @@ namespace ServerEye
 {
     public partial class MainWindow : Window
     {
-        private enum ConnectionStatus { Connected, Disconnected };
+        private enum AccessLevels { Admin, Lead, User, None};
         private AzureConnectionManager azureConnectionManager;
         private LogManager logManager;
         private DispatcherTimer timer;
 
         private TableDisplay tableDisplay;
+
+        private AccessLevels accessLevel = AccessLevels.None;
 
         public MainWindow()
         {
@@ -97,8 +99,7 @@ namespace ServerEye
                 strHTMLBuilder.Append("</body>");
                 strHTMLBuilder.Append("</html>");
                 string Htmltext = strHTMLBuilder.ToString();
-                //MessageBox.Show(Htmltext);
-                //File.WriteAllText(Directory.GetCurrentDirectory() + "/data.html", Htmltext);
+                File.WriteAllText(Directory.GetCurrentDirectory() + "/aaaBaba/data.html", Htmltext);
                 return Htmltext;
             }
             catch (Exception ex)
@@ -115,14 +116,18 @@ namespace ServerEye
             String SendMailSubject = "Scouting reports at->" + DateTime.Now.ToString("h:mm:ss tt");
             try
             {
-                String SendMailBody = "<h1>PickList<h1>" + DataTableToHTML(pickList) + "<br>" + "<h1>Amory One seat pick<h1>" + DataTableToHTML(amoryPick1) + "<br>" + "<h1>Amory Two seat pick<h1>" + DataTableToHTML(amoryPick2) + "<br>" + "<h2> Kilroy Was Here<h2>";
+                String SendMailBody = "<h1>ScoutEye Reports<h1> <hr> <br> <h2>PickList<h2>" + DataTableToHTML(pickList) + "<br> <hr> <br <h2>Amory One seat pick<h2>" +
+                    DataTableToHTML(amoryPick1) + "<br> <hr> <br <h1>Amory Two seat pick<h1>" + DataTableToHTML(amoryPick2) + "<br> <hr> <br <h2> Kilroy Was Here<h2>";
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com", 587);
                 SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
                 MailMessage email = new MailMessage();
                 // START
                 email.From = new MailAddress(SendMailFrom);
-                email.To.Add("jwtower@gmail.com");
-                email.To.Add("gabriel.tower@baxter-academy.org");
+                string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/emailRecps.txt");
+                foreach(string line in lines)
+                {
+                    email.To.Add(line);
+                }
                 email.CC.Add(SendMailFrom);
                 email.Subject = SendMailSubject;
                 email.Body = SendMailBody;
@@ -135,12 +140,34 @@ namespace ServerEye
                 SmtpServer.Send(email);
 
                 logManager.Log("Email Successfully Sent");
+                MessageBox.Show("Email Successfully Sent");
             }
             catch(Exception ex)
             {
                 logManager.Log(ex.Message); // A magical exception happens, but the email is still sent
                 MessageBox.Show($"Failed to send report \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private AccessLevels RetriveLevel()
+        {
+            string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/accessLevel.txt");
+            foreach (string line in lines)
+            {
+                if (line.Contains("admin"))
+                {
+                    return AccessLevels.Admin;
+                }
+                else if (line.Contains("lead"))
+                {
+                    return AccessLevels.User;
+                }
+                else if (line.Contains("user"))
+                {
+                    return AccessLevels.User;
+                }
+            }
+            return AccessLevels.None;
         }
 
         #region Event Handlers
@@ -160,18 +187,47 @@ namespace ServerEye
                     SafeBTN.IsEnabled = false;
                     break;
             }
+            accessLevel = RetriveLevel();
+            AccessLevelLB.Content = "Access Level: " + accessLevel.ToString();
 
             // If the value in the compID box isn't a number then don't enable the boxes
             try
             {
                 Int32.Parse(CompIDTB.Text);
-                foreach (UIElement element in Grid.Children)
+                switch (accessLevel)
                 {
-                    if (element is Button)
-                    {
-                        Button button = (Button)element;
-                        button.IsEnabled = true;
-                    }
+                    case AccessLevels.None:
+                        foreach (UIElement element in Grid.Children)
+                        {
+                            if (element is Button)
+                            {
+                                Button button = (Button)element;
+                                button.IsEnabled = false;
+                            }
+                        }
+                        break;
+                    case AccessLevels.User:
+                        foreach (UIElement element in Grid.Children)
+                        {
+                            if (element is Button)
+                            {
+                                Button button = (Button)element;
+                                button.IsEnabled = true;
+                            }
+                        }
+                        DirectQueryBTN.IsEnabled = false;
+                        InsertBTN.IsEnabled = false;
+                        break;
+                    case AccessLevels.Admin:
+                        foreach (UIElement element in Grid.Children)
+                        {
+                            if (element is Button)
+                            {
+                                Button button = (Button)element;
+                                button.IsEnabled = true;
+                            }
+                        }
+                        break;
                 }
             }
             catch
@@ -372,6 +428,20 @@ namespace ServerEye
                     break;
                 case MessageBoxResult.No: break;
             }
+        }
+        private void structuredQuery_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
+        }
+
+        private void directQuery_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
+        }
+
+        private void insert_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
         }
         #endregion
     }
