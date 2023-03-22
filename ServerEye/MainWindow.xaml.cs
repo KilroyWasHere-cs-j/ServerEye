@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -319,65 +320,58 @@ namespace ServerEye
 
         private void sendReports_Click(object sender, RoutedEventArgs e)
         {
-            try
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to send reports? This is a very noisey action", "Bubble bubble I'm a fishy", MessageBoxButton.YesNo, MessageBoxImage.Hand);
+            switch(result)
             {
-                DataSet pickListDS = new DataSet();
-                DataSet amoryFirstPickDS = new DataSet();
-                DataSet amorySecondPickDS = new DataSet();
-                if (azureConnectionManager.isConnected)
-                {
-                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
-                    adpter.Fill(pickListDS);
-                }
-                else
-                {
-                    azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
-                    adpter.Fill(pickListDS);
-                }
-                if (azureConnectionManager.isConnected)
-                {
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
-                    adpter.Fill(amoryFirstPickDS);
-                }
-                else
-                {
-                    azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
-                    adpter.Fill(amoryFirstPickDS);
-                }
-                if (azureConnectionManager.isConnected)
-                {
-                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
-                    adpter.Fill(amorySecondPickDS);
-                }
-                else
-                {
-                    azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
-                    adpter.Fill(amorySecondPickDS);
-                }
-                SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0], amorySecondPickDS.Tables[0]);
+                case MessageBoxResult.Yes:
+                    try
+                    {
+                        DataSet pickListDS = new DataSet();
+                        DataSet amoryFirstPickDS = new DataSet();
+                        DataSet amorySecondPickDS = new DataSet();
+                        if (azureConnectionManager.isConnected)
+                        {
+                            var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
+                            adpter.Fill(pickListDS);
+                        }
+                        else
+                        {
+                            azureConnectionManager.Connect();
+                            var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
+                            adpter.Fill(pickListDS);
+                        }
+                        if (azureConnectionManager.isConnected)
+                        {
+                            var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
+                            adpter.Fill(amoryFirstPickDS);
+                        }
+                        else
+                        {
+                            azureConnectionManager.Connect();
+                            var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
+                            adpter.Fill(amoryFirstPickDS);
+                        }
+                        if (azureConnectionManager.isConnected)
+                        {
+                            var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                            adpter.Fill(amorySecondPickDS);
+                        }
+                        else
+                        {
+                            azureConnectionManager.Connect();
+                            var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                            adpter.Fill(amorySecondPickDS);
+                        }
+                        SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0], amorySecondPickDS.Tables[0]);
+                    }
+                    catch (Exception ex)
+                    {
+                        logManager.Log(ex.Message);
+                        MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    break;
+                case MessageBoxResult.No: break;
             }
-            catch(Exception ex)
-            {
-                logManager.Log(ex.Message);
-                MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        private void structuredQuery_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void directQuery_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void insert_Click(object sender, RoutedEventArgs e)
-        {
-
         }
         #endregion
     }
