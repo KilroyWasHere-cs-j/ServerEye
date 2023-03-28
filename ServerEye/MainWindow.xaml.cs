@@ -42,16 +42,16 @@ namespace ServerEye
             // Needs to check if it's safe to close
             if (azureConnectionManager.isConnected)
             {
-                // Can't deside if we should keep this popup or not
+                // Can't decide if we should keep this popup or not
                 MessageBox.Show("Closing connection");
                 e.Cancel = true;
-                logManager.Log("App attemped to close with open connection. Closing prevented and connection automatically closed");
+                logManager.Log("App attempted to close with open connection. Closing prevented and connection automatically closed");
                 azureConnectionManager.closeConnection();
             }
             else
             {
                 e.Cancel = false;
-                logManager.Log("Connection closeing");
+                logManager.Log("Connection closing");
             }
         }
 
