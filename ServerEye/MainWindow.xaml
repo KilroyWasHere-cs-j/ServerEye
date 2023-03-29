@@ -28,5 +28,6 @@
         <Label Content="CompID" HorizontalAlignment="Left" Margin="54,14,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="CompIDTB" HorizontalAlignment="Left" Margin="54,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Height="20"/>
         <Label x:Name="AccessLevelLB" Content="AccessLevel" HorizontalAlignment="Left" Margin="553,-4,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="QueryTB" HorizontalAlignment="Left" Margin="24,132,0,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="323" Height="116"/>
     </Grid>
 </Window>

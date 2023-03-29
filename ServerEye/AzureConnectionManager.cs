@@ -85,9 +85,20 @@ namespace ServerEye
 
         }
 
-        public void RunStructuredQuery(int cID)
+        // SQL injections baby!
+        public OdbcDataAdapter RunStructuredQuery(int cID, string query)
         {
+            try
+            {
+                OdbcCommand cmd = new OdbcCommand(query, cnn);
+                return new OdbcDataAdapter(cmd);
 
+            }
+            catch(Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
         }
         #endregion
 
