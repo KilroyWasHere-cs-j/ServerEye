@@ -24,8 +24,13 @@
         <Button Content="Send Reports" HorizontalAlignment="Left" Margin="24,276,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="sendReports_Click" Grid.Row="1"/>
         <Button x:Name="InsertBTN" Content="Insert" IsEnabled="False" HorizontalAlignment="Left" Margin="599,276,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="insert_Click" Grid.Row="1"/>
         <Label Content="CompID" HorizontalAlignment="Left" Margin="54,14,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="CompIDTB" HorizontalAlignment="Left" Margin="54,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Height="20"/>
+        <TextBox x:Name="CompIDTB" HorizontalAlignment="Left" Margin="114,21,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Height="20"/>
         <Label x:Name="AccessLevelLB" Content="AccessLevel" HorizontalAlignment="Left" Margin="553,-4,0,0" VerticalAlignment="Top"/>
         <Button x:Name="GetScoutsNamesBTN" Content="Scout Names" IsEnabled="False" HorizontalAlignment="Left" Margin="599,127,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="scout_names_Click" Grid.Row="1"/>
+        <Button x:Name="GetAllTeams" Content="All Teams" IsEnabled="False" HorizontalAlignment="Left" Margin="599,180,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="get_all_teams_Click" Grid.Row="1"/>
+        <TextBox x:Name="SpecialCaseTB" HorizontalAlignment="Left" Margin="114,45,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Height="20"/>
+        <Label Content="Special case" HorizontalAlignment="Left" Margin="41,38,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="CompDescBTN" Content="Competition Descriptions" IsEnabled="False" HorizontalAlignment="Left" Margin="419,127,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="get_comp_desc_Click" Grid.Row="1"/>
+        <Button x:Name="MeticsBTN" Content="Get Metric" IsEnabled="False" HorizontalAlignment="Left" Margin="419,180,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="get_metrics_Click" Grid.Row="1"/>
     </Grid>
 </Window>
