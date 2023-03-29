@@ -79,6 +79,18 @@ namespace ServerEye
 
         #region Queries
 
+        #region Direct Queries
+        public void RunDirectQuery(int cID)
+        {
+
+        }
+
+        public void RunStructuredQuery(int cID)
+        {
+
+        }
+        #endregion
+
         public OdbcDataAdapter GetMatchData(int cID)
         {
             try
@@ -131,6 +143,7 @@ namespace ServerEye
         {
             try
             {
+                MessageBox.Show(cID.ToString());
                 OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_AmorySecondPick}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@CompetitionNumber", cID);

@@ -64,7 +64,7 @@ namespace ServerEye
                 logManager.Log("System safe");
             }
         }
-
+        
         private String DataTableToHTML(DataTable dt) 
         {
             try
