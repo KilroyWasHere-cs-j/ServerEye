@@ -121,10 +121,6 @@
   <data name="brrrr" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\brrrr.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="ConnectionString" xml:space="preserve">
-    <value>Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd={Q0L1Agpop-)+=R\\I;'G`};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;</value>
-    <comment>ODBC connection string to ScoutEyes Azure database</comment>
-  </data>
   <data name="ping_82822" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ping-82822.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

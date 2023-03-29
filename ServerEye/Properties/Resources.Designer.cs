@@ -70,15 +70,6 @@ namespace ServerEye.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd={Q0L1Agpop-)+=R\\I;&apos;G`};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;.
-        /// </summary>
-        internal static string ConnectionString {
-            get {
-                return ResourceManager.GetString("ConnectionString", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
         internal static System.IO.UnmanagedMemoryStream ping_82822 {

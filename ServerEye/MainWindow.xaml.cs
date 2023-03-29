@@ -314,7 +314,7 @@ namespace ServerEye
                     tableDisplay.Show();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logManager.Log(ex.Message);
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);

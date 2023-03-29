@@ -68,13 +68,20 @@ namespace ServerEye
 
         public void SendToHook(string message)
         {
-            //WindowsIdentity.GetCurrent().Name
-            string webhook = Properties.Resources.Webhook;
+            try
+            {
+                //WindowsIdentity.GetCurrent().Name
+                string webhook = Properties.Resources.Webhook;
 
-            WebClient client = new WebClient();
-            client.Headers.Add("Content-Type", "application/json");
-            string payload = "{\"content\": \"" + "Stevie Wonder " + message + " at-> " + DateTime.Now.ToString("h:mm:ss tt") + "\"}";
-            client.UploadData(webhook, Encoding.UTF8.GetBytes(payload));
+                WebClient client = new WebClient();
+                client.Headers.Add("Content-Type", "application/json");
+                string payload = "{\"content\": \"" + "Stevie Wonder " + message + " at-> " + DateTime.Now.ToString("h:mm:ss tt") + "\"}";
+                client.UploadData(webhook, Encoding.UTF8.GetBytes(payload));
+            }
+            catch (Exception e) 
+            { 
+                logManager.Log(e.Message); 
+            }
         }
 
         #region Queries
