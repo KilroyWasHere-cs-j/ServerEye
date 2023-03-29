@@ -118,7 +118,7 @@ namespace ServerEye
             // Needs to be able to handle instances with no parameters
             try
             {
-                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + "}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 return new OdbcDataAdapter(cmd);
             }
