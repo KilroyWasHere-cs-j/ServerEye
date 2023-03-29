@@ -204,6 +204,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Query.cs" />
     <Compile Include="TableDisplay.xaml.cs">
       <DependentUpon>TableDisplay.xaml</DependentUpon>
     </Compile>

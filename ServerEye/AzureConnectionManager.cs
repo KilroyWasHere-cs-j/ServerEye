@@ -80,13 +80,8 @@ namespace ServerEye
         #region Queries
 
         #region Direct Queries
-        public void RunDirectQuery(int cID)
-        {
-
-        }
-
         // SQL injections baby!
-        public OdbcDataAdapter RunStructuredQuery(int cID, string query)
+        public OdbcDataAdapter RunDirectQuery(int cID, string query)
         {
             try
             {
@@ -94,7 +89,7 @@ namespace ServerEye
                 return new OdbcDataAdapter(cmd);
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logManager.Log(e.Message);
                 return null;
@@ -102,14 +97,31 @@ namespace ServerEye
         }
         #endregion
 
-        public OdbcDataAdapter GetMatchData(int cID)
+        public OdbcDataAdapter ExecuteProcedure(Stored stored)
+        {
+            // Needs to be able to handle instances with no parameters
+            try
+            {
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue(stored.Parameters.Name, stored.Parameters.value);
+                return new OdbcDataAdapter(cmd);
+            }
+            catch (Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
+        }
+
+        public OdbcDataAdapter GetMatchData(Stored stored)
         {
             try
             {
                 // sp_Get_All_Match_Data
-                OdbcCommand cmd = new OdbcCommand("{call sp_Get_All_Match_Data (?)}", cnn);
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
+                cmd.Parameters.AddWithValue(stored.Parameters.Name, stored.Parameters.value);
                 return new OdbcDataAdapter(cmd);
             }
             catch(Exception e)
@@ -119,13 +131,13 @@ namespace ServerEye
             }
         }
 
-        public OdbcDataAdapter GetPickList(int cID)
+        public OdbcDataAdapter GetPickList(Stored stored)
         {
             try
             {
-                OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_RetrieveAverageScores_Summed (?)}", cnn);
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
+                cmd.Parameters.AddWithValue(stored.Parameters.Name, stored.Parameters.value);
                 return new OdbcDataAdapter(cmd);
             }
             catch(Exception e)
@@ -135,13 +147,13 @@ namespace ServerEye
             }
         }
 
-        public OdbcDataAdapter GenerateAmoryFirstPick(int cID)
+        public OdbcDataAdapter GenerateAmoryFirstPick(Stored stored)
         {
             try
             {
-                OdbcCommand cmd = new OdbcCommand("{call sp_amory_first_pick}", cnn);
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
+                cmd.Parameters.AddWithValue(stored.Parameters.Name, stored.Parameters.value);
                 return new OdbcDataAdapter(cmd);
             }
             catch(Exception e)
@@ -150,14 +162,13 @@ namespace ServerEye
                 return null;
             }
         }
-        public OdbcDataAdapter GenerateAmorySecondPick(int cID)
+        public OdbcDataAdapter GenerateAmorySecondPick(Stored stored)
         {
             try
             {
-                MessageBox.Show(cID.ToString());
-                OdbcCommand cmd = new OdbcCommand("{call sp_MatchData_AmorySecondPick}", cnn);
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CompetitionNumber", cID);
+                cmd.Parameters.AddWithValue(stored.Parameters.Name, stored.Parameters.value);
                 return new OdbcDataAdapter(cmd);
             }
             catch (Exception e)

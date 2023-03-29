@@ -149,6 +149,7 @@ namespace ServerEye
             }
         }
 
+        // Gets users level and sets the state of a public enum
         private AccessLevels RetriveLevel()
         {
             string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/accessLevel.txt");
@@ -215,7 +216,6 @@ namespace ServerEye
                                 button.IsEnabled = true;
                             }
                         }
-                        DirectQueryBTN.IsEnabled = false;
                         InsertBTN.IsEnabled = false;
                         break;
                     case AccessLevels.Admin:
@@ -260,22 +260,36 @@ namespace ServerEye
 
         private void pullDownAll_Click(object sender, RoutedEventArgs e)
         {
+            //Construct the parameters
+            Parameters parameters = new Parameters();
+            // Construct the stored procedure
+            Stored stored = new Stored();
+            // Name stored procedure
+            stored.Name = "sp_Get_All_Match_Data";
+            // Set the ID
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            // Set the stored procedure parameter name 
+            parameters.Name = "@CompetitionNumber";
+            // Set stored procedure parameter value
+            parameters.value = stored.cID;
+            // Add the parameters to the stored procedure
+            stored.Parameters = parameters;
             try
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GetMatchData(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GetMatchData(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
@@ -289,22 +303,29 @@ namespace ServerEye
 
         private void generatePickList_Click(object sender, RoutedEventArgs e)
         {
+            Parameters parameters = new Parameters();
+            Stored stored = new Stored();
+            stored.Name = "sp_MatchData_RetrieveAverageScores_Summed";
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            parameters.Name = "@CompetitionNumber";
+            parameters.value = stored.cID;
+            stored.Parameters = parameters;
             try
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     DataTableToHTML(ds.Tables[0]);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
@@ -318,22 +339,29 @@ namespace ServerEye
         }
         private void generateAmoryFirstPick_Click(object sender, RoutedEventArgs e)
         {
+            Parameters parameters = new Parameters();
+            Stored stored = new Stored();
+            stored.Name = "sp_amory_first_pick";
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            parameters.Name = "@CompetitionNumber";
+            parameters.value = stored.cID;
+            stored.Parameters = parameters;
             try
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
@@ -347,22 +375,29 @@ namespace ServerEye
 
         private void generateAmorySecondPick_Click(object sender, RoutedEventArgs e)
         {
+            Parameters parameters = new Parameters();
+            Stored stored = new Stored();
+            stored.Name = "sp_MatchData_AmorySecondPick";
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            parameters.Name = "@CompetitionNumber";
+            parameters.value = stored.cID;
+            stored.Parameters = parameters;
             try
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
                     DataSet ds = new DataSet();
-                    adpter.Fill(ds);
+                    adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
                     tableDisplay.Show();
                 }
@@ -376,62 +411,63 @@ namespace ServerEye
 
         private void sendReports_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to send reports? This is a very noisey action", "Bubble bubble I'm a fishy", MessageBoxButton.YesNo, MessageBoxImage.Hand);
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to send reports? This is a very noisy action", "Bubble bubble I'm a fishy", MessageBoxButton.YesNo, MessageBoxImage.Hand);
             switch(result)
             {
                 case MessageBoxResult.Yes:
-                    try
-                    {
-                        DataSet pickListDS = new DataSet();
-                        DataSet amoryFirstPickDS = new DataSet();
-                        DataSet amorySecondPickDS = new DataSet();
-                        if (azureConnectionManager.isConnected)
-                        {
-                            var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
-                            adpter.Fill(pickListDS);
-                        }
-                        else
-                        {
-                            azureConnectionManager.Connect();
-                            var adpter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
-                            adpter.Fill(pickListDS);
-                        }
-                        if (azureConnectionManager.isConnected)
-                        {
-                            var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
-                            adpter.Fill(amoryFirstPickDS);
-                        }
-                        else
-                        {
-                            azureConnectionManager.Connect();
-                            var adpter = azureConnectionManager.GenerateAmoryFirstPick(Int32.Parse(CompIDTB.Text));
-                            adpter.Fill(amoryFirstPickDS);
-                        }
-                        if (azureConnectionManager.isConnected)
-                        {
-                            var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
-                            adpter.Fill(amorySecondPickDS);
-                        }
-                        else
-                        {
-                            azureConnectionManager.Connect();
-                            var adpter = azureConnectionManager.GenerateAmorySecondPick(Int32.Parse(CompIDTB.Text));
-                            adpter.Fill(amorySecondPickDS);
-                        }
-                        SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0], amorySecondPickDS.Tables[0]);
-                    }
-                    catch (Exception ex)
-                    {
-                        logManager.Log(ex.Message);
-                        MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                    break;
+                    //try
+                    //{
+                    //    DataSet pickListDS = new DataSet();
+                    //    DataSet amoryFirstPickDS = new DataSet();
+                    //    DataSet amorySecondPickDS = new DataSet();
+                    //    if (azureConnectionManager.isConnected)
+                    //    {
+                    //        var adapter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
+                    //        adapter.Fill(pickListDS);
+                    //    }
+                    //    else
+                    //    {
+                    //        azureConnectionManager.Connect();
+                    //        var adapter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
+                    //        adapter.Fill(pickListDS);
+                    //    }
+                    //    if (azureConnectionManager.isConnected)
+                    //    {
+                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
+                    //        adapter.Fill(amoryFirstPickDS);
+                    //    }
+                    //    else
+                    //    {
+                    //        azureConnectionManager.Connect();
+                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
+                    //        adapter.Fill(amoryFirstPickDS);
+                    //    }
+                    //    if (azureConnectionManager.isConnected)
+                    //    {
+                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
+                    //        adapter.Fill(amorySecondPickDS);
+                    //    }
+                    //    else
+                    //    {
+                    //        azureConnectionManager.Connect();
+                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
+                    //        adapter.Fill(amorySecondPickDS);
+                    //    }
+                    //    SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0], amorySecondPickDS.Tables[0]);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    logManager.Log(ex.Message);
+                    //    MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    //}
+                    //break;
                 case MessageBoxResult.No: break;
             }
         }
+
         private void structuredQuery_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
+            
         }
 
         private void directQuery_Click(object sender, RoutedEventArgs e)
@@ -442,6 +478,39 @@ namespace ServerEye
         private void insert_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
+        }
+
+        private void scout_names_Click(object sender, RoutedEventArgs e)
+        {
+            Parameters parameters = new Parameters();
+            Stored stored = new Stored();
+            stored.Name = "sp_Get_Scouts";
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            try
+            {
+                if (azureConnectionManager.isConnected)
+                {
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         #endregion
     }
