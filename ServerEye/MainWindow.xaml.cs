@@ -490,7 +490,7 @@ namespace ServerEye
             {
                 if (azureConnectionManager.isConnected)
                 {
-                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    var adapter = azureConnectionManager.ExecuteCleanProcedure(stored);
                     DataSet ds = new DataSet();
                     adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);
@@ -499,7 +499,7 @@ namespace ServerEye
                 else
                 {
                     azureConnectionManager.Connect();
-                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    var adapter = azureConnectionManager.ExecuteCleanProcedure(stored);
                     DataSet ds = new DataSet();
                     adapter.Fill(ds);
                     tableDisplay = new TableDisplay(ds.Tables[0]);

@@ -113,6 +113,21 @@ namespace ServerEye
                 return null;
             }
         }
+        public OdbcDataAdapter ExecuteCleanProcedure(Stored stored)
+        {
+            // Needs to be able to handle instances with no parameters
+            try
+            {
+                OdbcCommand cmd = new OdbcCommand("{call " + stored.Name + " (?)}", cnn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                return new OdbcDataAdapter(cmd);
+            }
+            catch (Exception e)
+            {
+                logManager.Log(e.Message);
+                return null;
+            }
+        }
 
         public OdbcDataAdapter GetMatchData(Stored stored)
         {
