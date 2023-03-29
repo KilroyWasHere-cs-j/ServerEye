@@ -1,6 +1,8 @@
-﻿using System;
+﻿using NLog.Fluent;
+using System;
 using System.Data;
 using System.IO;
+using System.Media;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -181,10 +183,28 @@ namespace ServerEye
             {
                 case true:
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Green);
+                    try
+                    {
+                        SoundPlayer player = new SoundPlayer(Properties.Resources.ping_82822);
+                        player.Play();
+                    }
+                    catch (Exception ex) 
+                    {
+                        logManager.Log(ex.Message);
+                    }
                     SafeBTN.IsEnabled = true;
                     break;
                 case false:
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Red);
+                    try
+                    {
+                        SoundPlayer player = new SoundPlayer(Properties.Resources.ping_82822);
+                        player.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        logManager.Log(ex.Message);
+                    }
                     SafeBTN.IsEnabled = false;
                     break;
             }
@@ -415,52 +435,16 @@ namespace ServerEye
             switch(result)
             {
                 case MessageBoxResult.Yes:
-                    //try
-                    //{
-                    //    DataSet pickListDS = new DataSet();
-                    //    DataSet amoryFirstPickDS = new DataSet();
-                    //    DataSet amorySecondPickDS = new DataSet();
-                    //    if (azureConnectionManager.isConnected)
-                    //    {
-                    //        var adapter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
-                    //        adapter.Fill(pickListDS);
-                    //    }
-                    //    else
-                    //    {
-                    //        azureConnectionManager.Connect();
-                    //        var adapter = azureConnectionManager.GetPickList(Int32.Parse(CompIDTB.Text));
-                    //        adapter.Fill(pickListDS);
-                    //    }
-                    //    if (azureConnectionManager.isConnected)
-                    //    {
-                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
-                    //        adapter.Fill(amoryFirstPickDS);
-                    //    }
-                    //    else
-                    //    {
-                    //        azureConnectionManager.Connect();
-                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
-                    //        adapter.Fill(amoryFirstPickDS);
-                    //    }
-                    //    if (azureConnectionManager.isConnected)
-                    //    {
-                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
-                    //        adapter.Fill(amorySecondPickDS);
-                    //    }
-                    //    else
-                    //    {
-                    //        azureConnectionManager.Connect();
-                    //        var adapter = azureConnectionManager.ExecuteProcedure(Int32.Parse(CompIDTB.Text));
-                    //        adapter.Fill(amorySecondPickDS);
-                    //    }
-                    //    SendReports(pickListDS.Tables[0], amoryFirstPickDS.Tables[0], amorySecondPickDS.Tables[0]);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    logManager.Log(ex.Message);
-                    //    MessageBox.Show($"Failed to compile reports \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    //}
-                    //break;
+                    try
+                    {
+                        SoundPlayer sndplayr = new SoundPlayer(Properties.Resources.sonar_ping_95840);
+                        sndplayr.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        logManager.Log(ex.Message);
+                    }
+                    break;
                 case MessageBoxResult.No: break;
             }
         }
@@ -546,76 +530,123 @@ namespace ServerEye
         }
         private void get_comp_desc_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
-            //Parameters parameters = new Parameters();
-            //Stored stored = new Stored();
-            //stored.Name = "sp_MatchData_AmorySecondPick";
-            //stored.cID = Int32.Parse(CompIDTB.Text);
-            //parameters.Name = "@CompetitionNumber";
-            //parameters.value = stored.cID;
-            //stored.Parameters = parameters;
-            //try
-            //{
-            //    if (azureConnectionManager.isConnected)
-            //    {
-            //        var adapter = azureConnectionManager.ExecuteProcedure(stored);
-            //        DataSet ds = new DataSet();
-            //        adapter.Fill(ds);
-            //        tableDisplay = new TableDisplay(ds.Tables[0]);
-            //        tableDisplay.Show();
-            //    }
-            //    else
-            //    {
-            //        azureConnectionManager.Connect();
-            //        var adapter = azureConnectionManager.ExecuteProcedure(stored);
-            //        DataSet ds = new DataSet();
-            //        adapter.Fill(ds);
-            //        tableDisplay = new TableDisplay(ds.Tables[0]);
-            //        tableDisplay.Show();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    logManager.Log(ex.Message);
-            //    MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
+            Parameters parameters = new Parameters();
+            Stored stored = new Stored();
+            stored.Name = "sp_Get_CompDesc";
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            try
+            {
+                if (azureConnectionManager.isConnected)
+                {
+                    var adapter = azureConnectionManager.ExecuteCleanProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adapter = azureConnectionManager.ExecuteCleanProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void get_metrics_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
-            //Parameters parameters = new Parameters();
-            //Stored stored = new Stored();
-            //stored.Name = "sp_Get_Metrics";
-            //stored.cID = SpecialCaseTB.Text;
-            //parameters.Name = "@Year";
-            //parameters.value = stored.cID;
-            //stored.Parameters = parameters;
-            //try
-            //{
-            //    if (azureConnectionManager.isConnected)
-            //    {
-            //        var adapter = azureConnectionManager.ExecuteProcedure(stored);
-            //        DataSet ds = new DataSet();
-            //        adapter.Fill(ds);
-            //        tableDisplay = new TableDisplay(ds.Tables[0]);
-            //        tableDisplay.Show();
-            //    }
-            //    else
-            //    {
-            //        azureConnectionManager.Connect();
-            //        var adapter = azureConnectionManager.ExecuteProcedure(stored);
-            //        DataSet ds = new DataSet();
-            //        adapter.Fill(ds);
-            //        tableDisplay = new TableDisplay(ds.Tables[0]);
-            //        tableDisplay.Show();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    logManager.Log(ex.Message);
-            //    MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
+            Parameters parameters = new Parameters();
+            Stored stored = new Stored();
+            stored.Name = "sp_Get_Metrics";
+            try
+            {
+                stored.cID = Int32.Parse(SpecialCaseTB.Text);
+                parameters.Name = "@Year";
+                parameters.value = stored.cID;
+                stored.Parameters = parameters;
+            }
+            catch(Exception ex)
+            {
+                logManager.Log(ex.Message);
+            }
+            try
+            {
+                if (azureConnectionManager.isConnected)
+                {
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    tableDisplay = new TableDisplay(ds.Tables[0]);
+                    tableDisplay.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // An HTML file with all the comp data
+        private void run_raw_Click(object sender, RoutedEventArgs e)
+        {
+            DataTable dataTable = new DataTable();
+            //Construct the parameters
+            Parameters parameters = new Parameters();
+            // Construct the stored procedure
+            Stored stored = new Stored();
+            // Name stored procedure
+            stored.Name = "sp_Get_All_Match_Data";
+            // Set the ID
+            stored.cID = Int32.Parse(CompIDTB.Text);
+            // Set the stored procedure parameter name 
+            parameters.Name = "@CompetitionNumber";
+            // Set stored procedure parameter value
+            parameters.value = stored.cID;
+            // Add the parameters to the stored procedure
+            stored.Parameters = parameters;
+            try
+            {
+                if (azureConnectionManager.isConnected)
+                {
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    dataTable = ds.Tables[0];
+                }
+                else
+                {
+                    azureConnectionManager.Connect();
+                    var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    dataTable = ds.Tables[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                logManager.Log(ex.Message);
+                MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            DataTableToHTML(dataTable);
+            MessageBox.Show("HTML generated it's in ServerEye/aaaBaba/data.html", "Don't drink water upside down");
         }
         #endregion
     }

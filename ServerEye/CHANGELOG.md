@@ -1,4 +1,6 @@
-﻿Pull all data from Azure
+﻿# Changes
+
+Pull all data from Azure
 Generate picklist
 Safe button will close connection
 Table viewer renders data in a clean table

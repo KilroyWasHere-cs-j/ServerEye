@@ -32,5 +32,6 @@
         <Label Content="Special case" HorizontalAlignment="Left" Margin="41,38,0,0" VerticalAlignment="Top"/>
         <Button x:Name="CompDescBTN" Content="Competition Descriptions" IsEnabled="False" HorizontalAlignment="Left" Margin="419,127,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="get_comp_desc_Click" Grid.Row="1"/>
         <Button x:Name="MeticsBTN" Content="Get Metric" IsEnabled="False" HorizontalAlignment="Left" Margin="419,180,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="get_metrics_Click" Grid.Row="1"/>
+        <Button Content="Raw" HorizontalAlignment="Left" Margin="24,216,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="run_raw_Click" Grid.Row="1"/>
     </Grid>
 </Window>

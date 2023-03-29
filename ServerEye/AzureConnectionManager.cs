@@ -69,7 +69,7 @@ namespace ServerEye
         public void SendToHook(string message)
         {
             //WindowsIdentity.GetCurrent().Name
-            string webhook = "https://discord.com/api/webhooks/1082337403567620126/vlmEzBxb8jvIapfZLz4PDreZWWOFwP59-LE9rOkaRZ4YQNofF6nw-CLrJS0r6cbIBIwl";
+            string webhook = Properties.Resources.Webhook;
 
             WebClient client = new WebClient();
             client.Headers.Add("Content-Type", "application/json");

@@ -255,7 +255,16 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="CHANGELOG.txt" />
+    <None Include="CHANGELOG.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\brrrr.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sonar-ping-95840.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ping-82822.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Data.SqlClient.SNI.5.1.0\build\net462\Microsoft.Data.SqlClient.SNI.targets" Condition="Exists('..\packages\Microsoft.Data.SqlClient.SNI.5.1.0\build\net462\Microsoft.Data.SqlClient.SNI.targets')" />
