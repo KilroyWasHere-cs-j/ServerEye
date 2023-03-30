@@ -199,7 +199,10 @@ namespace ServerEye
                     {
                         dt.Columns.Add(header);
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        logManager.Log(ex.Message);
+                    }
                 }
                 while (!sr.EndOfStream)
                 {
@@ -211,7 +214,6 @@ namespace ServerEye
                     }
                     dt.Rows.Add(dr);
                 }
-
             }
             return dt;
         }
@@ -257,7 +259,7 @@ namespace ServerEye
             // If the value in the compID box isn't a number then don't enable the boxes
             try
             {
-                Int32.Parse(CompIDTB.Text);
+                _ = Int32.Parse(CompIDTB.Text);
                 switch (accessLevel)
                 {
                     case AccessLevels.None:

@@ -5,7 +5,7 @@ namespace ServerEye
     class LogManager
     {
         private static readonly NLog.Logger _log_ = NLog.LogManager.GetCurrentClassLogger();
-        private string path = null;
+        private string path = "";
         public LogManager(string _path) 
         {
             path = _path;
@@ -22,6 +22,11 @@ namespace ServerEye
             // Apply config           
             NLog.LogManager.Configuration = config;
             _log_.Debug("__LOGGING-INIT__");
+        }
+
+        ~LogManager()
+        { 
+            _log_.Debug("__LOGGING-EXIT__");
         }
 
         public void Log(string message)
