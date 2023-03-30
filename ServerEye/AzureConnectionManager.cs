@@ -9,9 +9,11 @@ namespace ServerEye
 {
     class AzureConnectionManager
     {
-        //  "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd={Q0L1Agpop-)+=R\\I;'G`};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; 
         // Privileges are extremely limited so security is not of the highest concern
-        public string connectionString = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=scouts;Pwd=ctx9hfd4cfk.tzx*TAT;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; // Stores connection string
+        private string connectionString = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=scouts;Pwd=ctx9hfd4cfk.tzx*TAT;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; // Stores connection string
+        // My code is a SQL injection
+        // Password is {Q0L1Agpop-)+=R\\I;'G`}
+        private string connectionStringI = "";
         public bool isConnected = false; // Indicates if the connection is open or closed
         public bool safe = true; // Indicates if it's okay to perform actions that could break the connection
 
@@ -22,6 +24,12 @@ namespace ServerEye
         public AzureConnectionManager()
         {
             logManager = new LogManager("logs/connection_log.txt");
+        }
+
+        // Yes I made a whole ass function for this...
+        private string BuildIConnectionString(string password)
+        {
+            return "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd=" + password + ";Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;";
         }
 
         //<summary>

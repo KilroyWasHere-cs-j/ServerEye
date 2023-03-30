@@ -35,5 +35,6 @@
         <Button Content="Raw" HorizontalAlignment="Left" Margin="24,216,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="run_raw_Click" Grid.Row="1"/>
         <Button x:Name="DirectQueryBTN" Content="Direct" IsEnabled="False" HorizontalAlignment="Left" Margin="575,224,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="directQuery_Click" Grid.Row="1"/>
         <Button x:Name="OpenQueryFile" Content="Open Query Editor" IsEnabled="False" HorizontalAlignment="Left" Margin="575,198,0,0" VerticalAlignment="Top" Height="21" Width="175" Click="open_query_editor_Click" Grid.Row="1"/>
+        <TextBox x:Name="Password" HorizontalAlignment="Left" Margin="575,175,0,0" Grid.Row="1" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="175"/>
     </Grid>
 </Window>
