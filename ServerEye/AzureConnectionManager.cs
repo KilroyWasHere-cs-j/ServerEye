@@ -187,6 +187,7 @@ namespace ServerEye
                 return null;
             }
         }
+
         public OdbcDataAdapter GenerateAmorySecondPick(Stored stored)
         {
             try
@@ -201,6 +202,11 @@ namespace ServerEye
                 logManager.Log(e.Message);
                 return null;
             }
+        }
+
+        public void Insert()
+        {
+
         }
         #endregion
     }

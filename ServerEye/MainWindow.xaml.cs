@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -21,7 +22,7 @@ namespace ServerEye
         private AzureConnectionManager azureConnectionManager;
         private LogManager logManager;
         private DispatcherTimer timer;
-
+        private OpenFileDialog fdlg;
         private TableDisplay tableDisplay;
 
         private AccessLevels accessLevel = AccessLevels.None;
@@ -31,10 +32,16 @@ namespace ServerEye
             InitializeComponent();
             logManager = new LogManager("logs/main_log.txt");
             azureConnectionManager = new AzureConnectionManager();
+            fdlg = new OpenFileDialog();
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(10);
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            fdlg.Title = "Server Insert Tool";
+            fdlg.Filter = "CSV Files (*.csv*)|*.csv*|All files (*.csv*)|*.csv*"; //Only allow xml files to be shown, which is the file used for configuration
+            fdlg.FilterIndex = 2;
+            fdlg.RestoreDirectory = true;
         }
 
         //<summary>
@@ -509,7 +516,8 @@ namespace ServerEye
 
         private void insert_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
+            fdlg.ShowDialog();
+            string filePath = fdlg.FileName;
         }
 
         private void scout_names_Click(object sender, RoutedEventArgs e)
