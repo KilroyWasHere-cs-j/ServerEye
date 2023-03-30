@@ -9,14 +9,15 @@ namespace ServerEye
 {
     class AzureConnectionManager
     {
-        public string connectionString = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd={Q0L1Agpop-)+=R\\I;'G`};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; // Stores connection string
+        //  "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd={Q0L1Agpop-)+=R\\I;'G`};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; 
+        // Privileges are extremely limited so security is not of the highest concern
+        public string connectionString = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=scouts;Pwd=ctx9hfd4cfk.tzx*TAT;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; // Stores connection string
         public bool isConnected = false; // Indicates if the connection is open or closed
         public bool safe = true; // Indicates if it's okay to perform actions that could break the connection
 
         private LogManager logManager;
         private TableDisplay td;
-
-        private OdbcConnection cnn;
+        private OdbcConnection cnn;  
 
         public AzureConnectionManager()
         {
@@ -88,11 +89,13 @@ namespace ServerEye
 
         #region Direct Queries
         // SQL injections baby!
-        public OdbcDataAdapter RunDirectQuery(int cID, string query)
+        public OdbcDataAdapter RunDirectQuery(string query)
         {
             try
             {
+                Connect();
                 OdbcCommand cmd = new OdbcCommand(query, cnn);
+                cmd.ExecuteScalar();
                 return new OdbcDataAdapter(cmd);
 
             }

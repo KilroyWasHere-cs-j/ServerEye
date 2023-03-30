@@ -1,6 +1,7 @@
-﻿using NLog.Fluent;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Net;
@@ -16,7 +17,7 @@ namespace ServerEye
 {
     public partial class MainWindow : Window
     {
-        private enum AccessLevels { Admin, Lead, User, None};
+        private enum AccessLevels { Admin, Lead, User, None };
         private AzureConnectionManager azureConnectionManager;
         private LogManager logManager;
         private DispatcherTimer timer;
@@ -60,14 +61,14 @@ namespace ServerEye
         // Disconnected the connection if it's open
         private void MakeSafe()
         {
-            if(azureConnectionManager.isConnected)
+            if (azureConnectionManager.isConnected)
             {
                 azureConnectionManager.closeConnection();
                 logManager.Log("System safe");
             }
         }
-        
-        private String DataTableToHTML(DataTable dt) 
+
+        private String DataTableToHTML(DataTable dt)
         {
             try
             {
@@ -112,21 +113,27 @@ namespace ServerEye
             }
         }
 
-        private void SendReports(DataTable pickList, DataTable amoryPick1, DataTable amoryPick2)
+        private void SendReports(List<DataTable> tables)
         {
             String SendMailFrom = "scouteyereports@gmail.com";
             String SendMailSubject = "Scouting reports at->" + DateTime.Now.ToString("h:mm:ss tt");
             try
             {
-                String SendMailBody = "<h1>ScoutEye Reports<h1> <hr> <br> <h2>PickList<h2>" + DataTableToHTML(pickList) + "<br> <hr> <br <h2>Amory One seat pick<h2>" +
-                    DataTableToHTML(amoryPick1) + "<br> <hr> <br <h1>Amory Two seat pick<h1>" + DataTableToHTML(amoryPick2) + "<br> <hr> <br <h2> Kilroy Was Here<h2>";
+                String SendMailBody = "<h1>ScoutEye Reports<h1> <hr> <br>";
+                foreach(DataTable table in tables)
+                {
+                    SendMailBody += DataTableToHTML(table);
+                    SendMailBody += "<br> <hr>";
+                }
+                //String SendMailBody = "<h1>ScoutEye Reports<h1> <hr> <br> <h2>PickList<h2>" + DataTableToHTML(pickList) + "<br> <hr> <br <h2>Amory One seat pick<h2>" +
+                //    DataTableToHTML(amoryPick1) + "<br> <hr> <br <h1>Amory Two seat pick<h1>" + DataTableToHTML(amoryPick2) + "<br> <hr> <br <h2> Kilroy Was Here<h2>";
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com", 587);
                 SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
                 MailMessage email = new MailMessage();
                 // START
                 email.From = new MailAddress(SendMailFrom);
                 string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/emailRecps.txt");
-                foreach(string line in lines)
+                foreach (string line in lines)
                 {
                     email.To.Add(line);
                 }
@@ -144,7 +151,7 @@ namespace ServerEye
                 logManager.Log("Email Successfully Sent");
                 MessageBox.Show("Email Successfully Sent");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logManager.Log(ex.Message); // A magical exception happens, but the email is still sent
                 MessageBox.Show($"Failed to send report \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -188,7 +195,7 @@ namespace ServerEye
                         SoundPlayer player = new SoundPlayer(Properties.Resources.ping_82822);
                         player.Play();
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
                         logManager.Log(ex.Message);
                     }
@@ -254,7 +261,7 @@ namespace ServerEye
             {
                 foreach (UIElement element in Grid.Children)
                 {
-                    if(element is Button)
+                    if (element is Button)
                     {
                         Button button = (Button)element;
                         button.IsEnabled = false;
@@ -271,7 +278,7 @@ namespace ServerEye
                     MakeSafe();
                     break;
             }
-        }   
+        }
 
         private void safe_Click(object sender, RoutedEventArgs e)
         {
@@ -351,7 +358,7 @@ namespace ServerEye
                     tableDisplay.Show();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logManager.Log(ex.Message);
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -386,7 +393,7 @@ namespace ServerEye
                     tableDisplay.Show();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logManager.Log(ex.Message);
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -431,14 +438,42 @@ namespace ServerEye
 
         private void sendReports_Click(object sender, RoutedEventArgs e)
         {
+            List<string> sps = new List<string>() { "sp_MatchData_RetrieveAverageScores_Summed", "sp_amory_first_pick", "sp_MatchData_AmorySecondPick" };
+            List<DataTable> tables = new List<DataTable>();
             MessageBoxResult result = MessageBox.Show("Are you sure you want to send reports? This is a very noisy action", "Bubble bubble I'm a fishy", MessageBoxButton.YesNo, MessageBoxImage.Hand);
-            switch(result)
+            switch (result)
             {
                 case MessageBoxResult.Yes:
                     try
                     {
                         SoundPlayer sndplayr = new SoundPlayer(Properties.Resources.sonar_ping_95840);
                         sndplayr.Play();
+                        foreach(string sp in sps) 
+                        { 
+                            Parameters parameters = new Parameters();
+                            Stored stored = new Stored();
+                            stored.Name = sp;
+                            stored.cID = Int32.Parse(CompIDTB.Text);
+                            parameters.Name = "@CompetitionNumber";
+                            parameters.value = stored.cID;
+                            stored.Parameters = parameters;
+                            if (azureConnectionManager.isConnected)
+                            {
+                                var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                                DataSet ds = new DataSet();
+                                adapter.Fill(ds);
+                                tables.Add(ds.Tables[0]);                           
+                            }
+                            else
+                            {
+                                azureConnectionManager.Connect();
+                                var adapter = azureConnectionManager.ExecuteProcedure(stored);
+                                DataSet ds = new DataSet();
+                                adapter.Fill(ds);
+                                tables.Add(ds.Tables[0]);
+                            }   
+                        }
+                        SendReports(tables);
                     }
                     catch (Exception ex)
                     {
@@ -449,14 +484,27 @@ namespace ServerEye
             }
         }
 
-        private void structuredQuery_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void directQuery_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("The further on the edge\r\nThe hotter the intensity\r\nHighway to the Danger Zone");
+            if (azureConnectionManager.isConnected)
+            {
+                string content = File.ReadAllText(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
+                var adapter = azureConnectionManager.RunDirectQuery(content);
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                string content = File.ReadAllText(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
+                var adapter = azureConnectionManager.RunDirectQuery(content);
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                tableDisplay = new TableDisplay(ds.Tables[0]);
+                tableDisplay.Show();
+            }
         }
 
         private void insert_Click(object sender, RoutedEventArgs e)
@@ -573,7 +621,7 @@ namespace ServerEye
                 parameters.value = stored.cID;
                 stored.Parameters = parameters;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logManager.Log(ex.Message);
             }
@@ -647,6 +695,14 @@ namespace ServerEye
             }
             DataTableToHTML(dataTable);
             MessageBox.Show("HTML generated it's in ServerEye/aaaBaba/data.html", "Don't drink water upside down");
+        }
+
+        //<summary>
+        // Open query file in default system text editor
+        //<summary>
+        private void open_query_editor_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
         }
         #endregion
     }
