@@ -518,6 +518,15 @@ namespace ServerEye
         {
             fdlg.ShowDialog();
             string filePath = fdlg.FileName;
+            if (azureConnectionManager.isConnected)
+            {
+                // Run query
+            }
+            else
+            {
+                azureConnectionManager.Connect();
+                // Run query
+            }
         }
 
         private void scout_names_Click(object sender, RoutedEventArgs e)
