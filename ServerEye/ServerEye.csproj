@@ -269,6 +269,12 @@
   <ItemGroup>
     <None Include="Resources\connectionString.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\missle.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\autopilot.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Data.SqlClient.SNI.5.1.0\build\net462\Microsoft.Data.SqlClient.SNI.targets" Condition="Exists('..\packages\Microsoft.Data.SqlClient.SNI.5.1.0\build\net462\Microsoft.Data.SqlClient.SNI.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

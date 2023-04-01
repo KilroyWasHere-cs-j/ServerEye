@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -8,11 +7,15 @@ using System.Media;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+
+using Microsoft.Win32;
 
 namespace ServerEye
 {
@@ -42,6 +45,19 @@ namespace ServerEye
             fdlg.Filter = "CSV Files (*.csv*)|*.csv*|All files (*.csv*)|*.csv*"; //Only allow xml files to be shown, which is the file used for configuration
             fdlg.FilterIndex = 2;
             fdlg.RestoreDirectory = true;
+            int random = new Random().Next(0, 100);
+        }
+
+        private void playMissile()
+        {
+            SoundPlayer player = new SoundPlayer(Properties.Resources.missile);
+            player.PlaySync();
+        }
+
+        private void playAuto()
+        {
+            SoundPlayer player = new SoundPlayer(Properties.Resources.autopilot);
+            player.PlaySync();
         }
 
         /// <summary>
@@ -51,6 +67,8 @@ namespace ServerEye
         {
             if (azureConnectionManager.isConnected)
             {
+                Thread player = new Thread(playAuto);
+                player.Start();
                 azureConnectionManager.closeConnection();
                 logManager.Log("System safe");
             }
@@ -257,8 +275,8 @@ namespace ServerEye
                     //Shit error works either way
                 }
             }
-            else
-            {
+            else 
+            { 
                 e.Cancel = false;
                 logManager.Log("Connection closing");
             }
@@ -570,9 +588,9 @@ namespace ServerEye
                 case MessageBoxResult.Yes:
                     try
                     {
-                        SoundPlayer sndplayr = new SoundPlayer(Properties.Resources.sonar_ping_95840);
-                        sndplayr.Play();
-                        foreach(string sp in sps) 
+                        Thread playerThread = new Thread(playMissile);
+                        playerThread.Start();
+                        foreach (string sp in sps) 
                         { 
                             Parameters parameters = new Parameters();
                             Stored stored = new Stored();
