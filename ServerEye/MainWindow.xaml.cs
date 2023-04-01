@@ -44,28 +44,9 @@ namespace ServerEye
             fdlg.RestoreDirectory = true;
         }
 
-        //<summary>
-        // If a server connection is open, the app will not close until the connection is closed
-        // <summary>
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            // Needs to check if it's safe to close
-            if (azureConnectionManager.isConnected)
-            {
-                // Can't decide if we should keep this popup or not
-                MessageBox.Show("Closing connection");
-                e.Cancel = true;
-                logManager.Log("App attempted to close with open connection. Closing prevented and connection automatically closed");
-                azureConnectionManager.closeConnection();
-            }
-            else
-            {
-                e.Cancel = false;
-                logManager.Log("Connection closing");
-            }
-        }
-
-        // Disconnected the connection if it's open
+        /// <summary>
+        /// Close connection if it's open
+        /// </summary>
         private void MakeSafe()
         {
             if (azureConnectionManager.isConnected)
@@ -74,7 +55,12 @@ namespace ServerEye
                 logManager.Log("System safe");
             }
         }
-
+        /// <summary>
+        /// Converts a DataTable object to raw HTML
+        /// </summary>
+        /// <remarks>Returned HTML has minimal formatting</remarks>
+        /// <param name="dt">Datatable</param>
+        /// <returns>HTML file as a string</returns>
         private String DataTableToHTML(DataTable dt)
         {
             try
@@ -119,7 +105,10 @@ namespace ServerEye
                 return null;
             }
         }
-
+        /// <summary>
+        /// Sends the reports to the email addresses in the emailRecps.txt file
+        /// </summary>
+        /// <param name="tables">List of datatables</param>
         private void SendReports(List<DataTable> tables)
         {
             String SendMailFrom = "scouteyereports@gmail.com";
@@ -127,66 +116,89 @@ namespace ServerEye
             try
             {
                 String SendMailBody = "<h1>ScoutEye Reports<h1> <hr> <br>";
+                // Iterates through the list of tables and adds them to the email body
                 foreach(DataTable table in tables)
                 {
                     SendMailBody += DataTableToHTML(table);
                     SendMailBody += "<br> <hr>";
                 }
-                //String SendMailBody = "<h1>ScoutEye Reports<h1> <hr> <br> <h2>PickList<h2>" + DataTableToHTML(pickList) + "<br> <hr> <br <h2>Amory One seat pick<h2>" +
-                //    DataTableToHTML(amoryPick1) + "<br> <hr> <br <h1>Amory Two seat pick<h1>" + DataTableToHTML(amoryPick2) + "<br> <hr> <br <h2> Kilroy Was Here<h2>";
+                // Configure the SMTP client
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com", 587);
                 SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
                 MailMessage email = new MailMessage();
                 // START
                 email.From = new MailAddress(SendMailFrom);
+                // Reads the email addresses from the emailRecps.txt file
                 string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/emailRecps.txt");
+                // Adds the email addresses to the email
                 foreach (string line in lines)
                 {
                     email.To.Add(line);
                 }
+                // Sets up basic email information
                 email.CC.Add(SendMailFrom);
                 email.Subject = SendMailSubject;
                 email.Body = SendMailBody;
                 email.IsBodyHtml = true;
                 //END
+                // Configures server connection and security
                 SmtpServer.Timeout = 5000;
                 SmtpServer.EnableSsl = true;
                 SmtpServer.UseDefaultCredentials = false;
                 SmtpServer.Credentials = new NetworkCredential(SendMailFrom, "dsoiisecxpnsiupz");
+                // Sends the email
                 SmtpServer.Send(email);
-
+                // Update user on success
                 logManager.Log("Email Successfully Sent");
                 MessageBox.Show("Email Successfully Sent");
             }
             catch (Exception ex)
             {
+                // Update user on failure
                 logManager.Log(ex.Message); // A magical exception happens, but the email is still sent
                 MessageBox.Show($"Failed to send report \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        // Gets users level and sets the state of a public enum
+        /// <summary>
+        /// Gets and sets the access level of the user from the /aaaBaba/accessLevel.txt file
+        /// </summary>
+        /// <returns>AccessLevels enum</returns>
         private AccessLevels RetriveLevel()
         {
-            string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/accessLevel.txt");
-            foreach (string line in lines)
+            try
             {
-                if (line.Contains("admin"))
+                string[] lines = File.ReadAllLines(Directory.GetCurrentDirectory().ToString() + "/aaaBaba/accessLevel.txt");
+                foreach (string line in lines)
                 {
-                    return AccessLevels.Admin;
+                    if (line.Contains("admin"))
+                    {
+                        return AccessLevels.Admin;
+                    }
+                    else if (line.Contains("lead"))
+                    {
+                        return AccessLevels.User;
+                    }
+                    else if (line.Contains("user"))
+                    {
+                        return AccessLevels.User;
+                    }
                 }
-                else if (line.Contains("lead"))
-                {
-                    return AccessLevels.User;
-                }
-                else if (line.Contains("user"))
-                {
-                    return AccessLevels.User;
-                }
+                return AccessLevels.None;
             }
-            return AccessLevels.None;
+            catch(Exception ex)
+            {
+                MessageBox.Show("Can not unlock UI" + ex.Message.ToString(), "Fatal... this is serious");
+                logManager.Log(ex.Message);
+                return AccessLevels.None;
+            }
         }
-
+        /// <summary>
+        /// Coverts a CSV file to a DataTable object
+        /// </summary>
+        /// <param name="strFilePath">Path to the CSV file</param>
+        /// <param name="csvDelimiter">Char used to delimit the CSV file</param>
+        /// <returns></returns>
         public DataTable CSVtoDataTable(string strFilePath, char csvDelimiter)
         {
             DataTable dt = new DataTable();
@@ -219,17 +231,51 @@ namespace ServerEye
         }
 
         #region Event Handlers
-        //<summary>
-        // Watchdog to update UI
-        //<summary>
+        /// <summary>
+        /// Captures window closing event and stops it if Azure connection is still open, and closes it
+        /// </summary>
+        /// <remarks>Currently if the connection is open and the </remarks>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Needs to check if it's safe to close
+            if (azureConnectionManager.isConnected)
+            {
+                // Can't decide if we should keep this popup or not
+                MessageBox.Show("Closing connection");
+                e.Cancel = true;
+                logManager.Log("App attempted to close with open connection. Closing prevented and connection automatically closed");
+                azureConnectionManager.closeConnection();
+                e.Cancel = false;
+                try
+                {
+                    this.Close();
+                }
+                catch
+                {
+                    //Shit error works either way
+                }
+            }
+            else
+            {
+                e.Cancel = false;
+                logManager.Log("Connection closing");
+            }
+        }
+        ///<summary>
+        /// Watchdog to update UI
+        ///<summary>
         private void Timer_Tick(object sender, EventArgs e)
         {
             switch (azureConnectionManager.isConnected)
             {
                 case true:
+                    // If connected set the indictor button to green and play a sound
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Green);
                     try
                     {
+                        // If the sound file is missing then don't crash that would be double plus ungood
                         SoundPlayer player = new SoundPlayer(Properties.Resources.ping_82822);
                         player.Play();
                     }
@@ -239,10 +285,13 @@ namespace ServerEye
                     }
                     SafeBTN.IsEnabled = true;
                     break;
+
                 case false:
+                    // If connected set the indictor button to green and play a sound
                     ConnectionStatusLight.Fill = new SolidColorBrush(Colors.Red);
                     try
                     {
+                        // If the sound file is missing then don't crash that would be double plus ungood
                         SoundPlayer player = new SoundPlayer(Properties.Resources.ping_82822);
                         player.Play();
                     }
@@ -253,6 +302,7 @@ namespace ServerEye
                     SafeBTN.IsEnabled = false;
                     break;
             }
+            // Get and update the user access level
             accessLevel = RetriveLevel();
             AccessLevelLB.Content = "Access Level: " + accessLevel.ToString();
 
@@ -263,6 +313,7 @@ namespace ServerEye
                 switch (accessLevel)
                 {
                     case AccessLevels.None:
+                        // Either the access level is none or it's really set to none. Either way disable all the buttons
                         foreach (UIElement element in Grid.Children)
                         {
                             if (element is Button)
@@ -272,7 +323,9 @@ namespace ServerEye
                             }
                         }
                         break;
+
                     case AccessLevels.User:
+                        // If the user is a user then enable all the buttons except for the insert button
                         foreach (UIElement element in Grid.Children)
                         {
                             if (element is Button)
@@ -283,7 +336,9 @@ namespace ServerEye
                         }
                         InsertBTN.IsEnabled = false;
                         break;
+
                     case AccessLevels.Admin:
+                        // If the user is an admin then enable all the buttons
                         foreach (UIElement element in Grid.Children)
                         {
                             if (element is Button)
@@ -295,8 +350,10 @@ namespace ServerEye
                         break;
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                logManager.Log(ex.Message);
+                // If no level is found or a error happens in the above code then disable all the buttons
                 foreach (UIElement element in Grid.Children)
                 {
                     if (element is Button)
@@ -307,7 +364,11 @@ namespace ServerEye
                 }
             }
         }
-
+        /// <summary>
+        /// Event handler it handles the key press event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bind_KeyPress(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -317,12 +378,20 @@ namespace ServerEye
                     break;
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void safe_Click(object sender, RoutedEventArgs e)
         {
             MakeSafe();
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pullDownAll_Click(object sender, RoutedEventArgs e)
         {
             //Construct the parameters
@@ -365,7 +434,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void generatePickList_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -402,6 +475,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void generateAmoryFirstPick_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -437,7 +515,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void generateAmorySecondPick_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -473,7 +555,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void sendReports_Click(object sender, RoutedEventArgs e)
         {
             List<string> sps = new List<string>() { "sp_MatchData_RetrieveAverageScores_Summed", "sp_amory_first_pick", "sp_MatchData_AmorySecondPick" };
@@ -521,7 +607,11 @@ namespace ServerEye
                 case MessageBoxResult.No: break;
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void directQuery_Click(object sender, RoutedEventArgs e)
         {
             if (azureConnectionManager.isConnected)
@@ -544,7 +634,11 @@ namespace ServerEye
                 tableDisplay.Show();
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void insert_Click(object sender, RoutedEventArgs e)
         {
             fdlg.ShowDialog();
@@ -559,7 +653,11 @@ namespace ServerEye
                 // Run query
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void scout_names_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -592,6 +690,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void get_all_teams_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -624,6 +727,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void get_comp_desc_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -656,7 +764,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void get_metrics_Click(object sender, RoutedEventArgs e)
         {
             Parameters parameters = new Parameters();
@@ -699,8 +811,11 @@ namespace ServerEye
                 MessageBox.Show($"Query failed \n {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        // An HTML file with all the comp data
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void run_raw_Click(object sender, RoutedEventArgs e)
         {
             DataTable dataTable = new DataTable();
@@ -745,9 +860,9 @@ namespace ServerEye
             MessageBox.Show("HTML generated it's in ServerEye/aaaBaba/data.html", "Don't drink water upside down");
         }
 
-        //<summary>
-        // Open query file in default system text editor
-        //<summary>
+        ///<summary>
+        /// Open query file in default system text editor
+        ///<summary>
         private void open_query_editor_Click(object sender, RoutedEventArgs e)
         {
             Process.Start(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");

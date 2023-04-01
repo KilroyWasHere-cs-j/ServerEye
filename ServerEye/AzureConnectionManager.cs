@@ -12,7 +12,6 @@ namespace ServerEye
         // Privileges are extremely limited so security is not of the highest concern
         private readonly string connectionString = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=scouts;Pwd=ctx9hfd4cfk.tzx*TAT;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; // Stores connection string
         // My code is a SQL injection
-        // Password is {Q0L1Agpop-)+=R\\I;'G`}
         public bool isConnected = false; // Indicates if the connection is open or closed
         public bool safe = true; // Indicates if it's okay to perform actions that could break the connection
 
@@ -36,9 +35,9 @@ namespace ServerEye
             return "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=ScoutEye;Pwd=" + password + ";Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;";
         }
 
-        //<summary>
-        // Connects to Azure database
-        //<summary>
+        ///<summary>
+        /// Connects to Azure database
+        ///</summary>
         public void Connect()
         {
             logManager.Log("Connecting to Azure...");
@@ -58,9 +57,9 @@ namespace ServerEye
             }
         }
 
-        //<summary>
-        // Disconnects from Azure database
-        //<summary>
+        ///<summary>
+        /// Disconnects from Azure database
+        ///</summary>
         public void closeConnection()
         {
             logManager.Log("Disconnecting form Azure...");
@@ -79,6 +78,10 @@ namespace ServerEye
             }
         }
 
+        ///  <summary>
+        /// Sends a message to the webhook
+        /// </summary>
+        /// <param name="message">Definds the message to be sent to the discord server</param>
         public void SendToHook(string message)
         {
             try
@@ -102,6 +105,11 @@ namespace ServerEye
 
         #region Direct Queries
         // SQL injections baby!
+        /// <summary>
+        /// Runs a direct query on the database, uses a readonly user so it's safeish
+        /// </summary>
+        /// <param name="query">Valid SQL query</param>
+        /// <returns>OdbcDataAdapter</returns>
         public OdbcDataAdapter RunDirectQuery(string query)
         {
             try
@@ -119,6 +127,11 @@ namespace ServerEye
         }
         #endregion
 
+        ///<summary>
+        /// Runs a stored procedure on the database with parameters
+        ///</summary>
+        /// <param name="stored">Instance of the Stored class, that repersents the sp to be executed</param>
+        /// <returns>OdbcDataAdapter</returns>
         public OdbcDataAdapter ExecuteProcedure(Stored stored)
         {
             // Needs to be able to handle instances with no parameters
@@ -136,6 +149,11 @@ namespace ServerEye
             }
         }
 
+        /// <summary>
+        /// Runs a stored procedure on the database with parameters
+        /// </summary>
+        /// <param name="stored">Instance of the Stored class, that repersents the sp to be executed. WITHOUT params</param>
+        /// <returns>OdbcDataAdapter</returns>
         public OdbcDataAdapter ExecuteCleanProcedure(Stored stored)
         {
             // Needs to be able to handle instances with no parameters
@@ -152,7 +170,12 @@ namespace ServerEye
             }
         }
 
-        public void Insert()
+        /// <summary>
+        /// Inserts data into the database
+        /// As this uses writing privileges it requires the user to input
+        /// </summary>
+        /// <param name="password">Password to be inserted</param>
+        public void Insert(string password)
         {
 
         }
