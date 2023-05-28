@@ -177,7 +177,7 @@ namespace ServerEye
         /// <param name="password">Password to be inserted</param>
         public void Insert(string password, string dataPath, int compID)
         {
-
+            throw new NotImplementedException();
         }
         #endregion
     }
