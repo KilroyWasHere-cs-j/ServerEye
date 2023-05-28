@@ -52,14 +52,14 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Button Content="Send Reports" HorizontalAlignment="Left" Margin="24,364,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="sendReports_Click">
+        <Button Content="Send Reports" HorizontalAlignment="Left" Margin="24,364,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="sendReports_Click" ToolTip="Send out HTML formatted reports out via email">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Button x:Name="InsertBTN" Content="Insert" IsEnabled="False" HorizontalAlignment="Left" Margin="435,304,0,0" VerticalAlignment="Top" Height="107" Width="304" Click="insert_Click">
+        <Button x:Name="InsertBTN" Content="Insert" IsEnabled="False" HorizontalAlignment="Left" Margin="435,328,0,0" VerticalAlignment="Top" Height="83" Width="304" Click="insert_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
@@ -111,28 +111,28 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Button Content="Raw" HorizontalAlignment="Left" Margin="24,304,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="run_raw_Click">
+        <Button Content="Raw" HorizontalAlignment="Left" Margin="24,304,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="run_raw_Click" ToolTip="Pull raw comp data">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Button x:Name="DirectQueryBTN" Content="Direct" IsEnabled="False" HorizontalAlignment="Left" Margin="239,364,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="directQuery_Click">
+        <Button x:Name="DirectQueryBTN" Content="Direct" IsEnabled="False" HorizontalAlignment="Left" Margin="239,364,0,0" VerticalAlignment="Top" Height="47" Width="175" Click="directQuery_Click" ToolTip="Runs content of ">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Button x:Name="OpenQueryFile" Content="Open Query Editor" IsEnabled="False" HorizontalAlignment="Left" Margin="239,330,0,0" VerticalAlignment="Top" Height="21" Width="175" Click="open_query_editor_Click">
+        <Button x:Name="OpenQueryFile" Content="Open Query Editor" IsEnabled="False" HorizontalAlignment="Left" Margin="239,330,0,0" VerticalAlignment="Top" Height="21" Width="175" Click="open_query_editor_Click" ToolTip="Opens query text file in default text editor">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <TextBox x:Name="Password" HorizontalAlignment="Left" Margin="239,304,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="175" Height="18">
+        <TextBox x:Name="Password" HorizontalAlignment="Left" Margin="435,305,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="304" Height="18">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="3"/>

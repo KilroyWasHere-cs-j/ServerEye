@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.Odbc;
-using System.Media;
 using System.Net;
 using System.Text;
 using System.Windows;
@@ -10,7 +9,7 @@ namespace ServerEye
 {
     class AzureConnectionManager
     {
-        // Privileges are extremely limited so security is not of the highest concern
+        // Privileges are extremely limited so security is not of the highest concern :)
         private readonly string connectionString = "Driver={ODBC Driver 18 for SQL Server};Server=tcp:scouteye.database.windows.net,1433;Database=ScoutEye;Uid=scouts;Pwd=ctx9hfd4cfk.tzx*TAT;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"; // Stores connection string
         // My code is a SQL injection
         public bool isConnected = false; // Indicates if the connection is open or closed
@@ -176,7 +175,7 @@ namespace ServerEye
         /// As this uses writing privileges it requires the user to input
         /// </summary>
         /// <param name="password">Password to be inserted</param>
-        public void Insert(string password)
+        public void Insert(string password, string dataPath, int compID)
         {
 
         }

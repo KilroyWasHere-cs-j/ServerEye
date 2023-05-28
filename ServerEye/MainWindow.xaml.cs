@@ -657,16 +657,29 @@ namespace ServerEye
         /// <param name="e"></param>
         private void insert_Click(object sender, RoutedEventArgs e)
         {
+            // Promat user to locate csv file to be inserted
             fdlg.ShowDialog();
-            string filePath = fdlg.FileName;
-            if (azureConnectionManager.isConnected)
+            // Ask user if the file and location is correct
+            MessageBoxResult result = MessageBox.Show($"Pulling data from CSV at {fdlg.FileName} is this okay?", "I'm behind you", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            // Handle user response
+            switch (result)
             {
-                // Run query
-            }
-            else
-            {
-                azureConnectionManager.Connect();
-                // Run query
+                case MessageBoxResult.Yes:
+                    // Is the user already connected to the database
+                    // User is connected, thus don't need to connect again
+                    if (azureConnectionManager.isConnected)
+                    {
+                        azureConnectionManager.Insert(Password.Text, fdlg.FileName, Int32.Parse(CompIDTB.Text));
+                    }
+                    //User is not connected, lets help them out
+                    else
+                    {
+                        azureConnectionManager.Connect();
+                        azureConnectionManager.Insert(Password.Text, fdlg.FileName, Int32.Parse(CompIDTB.Text));
+                    }
+                    break;
+                // Either file type, location, or name is wrong, or they just like the word no
+                case MessageBoxResult.No: break;
             }
         }
         /// <summary>
@@ -881,7 +894,20 @@ namespace ServerEye
         ///<summary>
         private void open_query_editor_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
+            // Attempts to open query file
+            try
+            {
+                Process.Start(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
+            }
+            // If can't be opened create one
+            catch
+            {
+                // Create file
+                FileStream fs = File.Create(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
+                // Immediately close file cause otherwise it will conflict when it's opened in default text editor
+                fs.Close();
+                Process.Start(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
+            }
         }
         #endregion
     }
