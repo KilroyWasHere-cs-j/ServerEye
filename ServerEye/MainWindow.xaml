@@ -139,5 +139,12 @@
                 </Style>
             </TextBox.Resources>
         </TextBox>
+        <Button Content="Get comp IDs" HorizontalAlignment="Left" Margin="41,70,0,0" VerticalAlignment="Top" Height="18" Width="158" Click="getAllCompIDs_Click">
+            <Button.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
     </Grid>
 </Window>

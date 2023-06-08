@@ -175,6 +175,8 @@ namespace ServerEye
         /// As this uses writing privileges it requires the user to input
         /// </summary>
         /// <param name="password">Password to be inserted</param>
+        /// <param name="dataPath">Path to CSV file to be inserted</param>
+        /// <param name="compID">ID of comp to insert into</param>
         public void Insert(string password, string dataPath, int compID)
         {
             throw new NotImplementedException();

@@ -279,6 +279,7 @@ namespace ServerEye
                 logManager.Log("Connection closing");
             }
         }
+
         ///<summary>
         /// Watchdog to update UI
         ///<summary>
@@ -908,6 +909,14 @@ namespace ServerEye
                 fs.Close();
                 Process.Start(Directory.GetCurrentDirectory() + "\\aaaBaba\\query.txt");
             }
+        }
+
+        ///<summary>
+        /// Gets all comp IDs
+        /// </summary>
+        private void getAllCompIDs_Click(object sender, RoutedEventArgs e)
+        {
+
         }
         #endregion
     }
